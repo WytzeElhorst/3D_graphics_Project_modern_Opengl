@@ -1,0 +1,25 @@
+﻿  main.cpp
+c:\users\welho\downloads\tp5_students\main.cpp(428): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(429): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(430): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(432): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(433): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(434): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(437): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(438): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(441): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(442): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(471): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(472): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(475): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(476): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(479): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(480): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(483): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(484): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\downloads\tp5_students\main.cpp(522): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
+c:\users\welho\downloads\tp5_students\main.cpp(526): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
+c:\users\welho\downloads\tp5_students\main.cpp(568): warning C4018: '<': signed/unsigned mismatch
+c:\users\welho\downloads\tp5_students\main.cpp(574): warning C4018: '<': signed/unsigned mismatch
+c:\users\welho\downloads\tp5_students\main.cpp(592): warning C4018: '<': signed/unsigned mismatch
+  ShadowMappingExercise.vcxproj -> C:\Users\Welho\Downloads\TP5_Students\visual studio\Debug\ShadowMappingExercise.exe
