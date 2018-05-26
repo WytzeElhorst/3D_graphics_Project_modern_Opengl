@@ -44,7 +44,7 @@ struct Vertex {
 	glm::vec3 normal;
 	glm::vec2 UV;
 	int ID;
-	float bulnum;
+	int bulnum;
 	glm::vec2 traj;
 	glm::vec2 offset;
 	glm::vec4 ori0, ori1, ori2, ori3;
@@ -57,6 +57,8 @@ std::vector<Vertex> bullets;
 float nextbul = 0;
 bool is8 = false;
 float bullettime = 0;
+glm::vec4 bulletmult;
+glm::vec4 bulletmult2;
 double prevtime = 0;
 
 glm::vec2 shiplocation;
@@ -323,7 +325,7 @@ void initWeaponMesh()
 	vertices.push_back(ver4);
 }
 
-void initBulletMesh(float bulnum, glm::vec2 t, glm::mat4 rot)
+void initBulletMesh(int bulnum, glm::vec2 t, glm::mat4 rot)
 {
 	glm::vec3 v1 = glm::vec3(-0.5f, -0.5f, -0.5f);
 	glm::vec3 v2 = glm::vec3(-0.5f, -0.5f, 0.5f);
@@ -944,6 +946,8 @@ int main() {
 			glm::mat4 mvp2 = secondCamera.vpMatrix();
 			glUniformMatrix4fv(glGetUniformLocation(shadowProgram, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp2));
 			glUniformMatrix4fv(glGetUniformLocation(shadowProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(shadowProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
 
@@ -984,20 +988,38 @@ int main() {
 			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "lightMVP"), 1, GL_FALSE, glm::value_ptr(lightMVP));
 			if (prevtime + 0.250 <= glfwGetTime()) {
 				initBulletMesh(nextbul, glm::vec2(xpos, ypos), model);
+				if (nextbul < 4) {
+					bulletmult[nextbul] = 0.0f;
+				}
+				if (nextbul >= 4) {
+					bulletmult2[nextbul - 4] = 0.0f;
+				}
 				nextbul++;
+				if (nextbul >= 8) {
+					nextbul = 0;
+				}
 				if (bullets.size() >= 36 * 8) {
 					bullets.erase(bullets.begin(), bullets.begin() + 36);
 				}
-				std::cout << nextbul;
 				removeBullets();
 				addVertices(bullets);
 				glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 				prevtime = glfwGetTime();
 			}
+			for (int i = 0; i < 4; i++) {
+				bulletmult[i] += 0.1f;
+				bulletmult2[i] += 0.1f;
+			}
+			std::cout << bulletmult[2];
+			std::cout << " ";
+
 			// Set view position
 			glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(mainCamera.position));
 
 			glUniform3fv(glGetUniformLocation(mainProgram, "lightPos"), 1, glm::value_ptr(secondCamera.position));
+
+			glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
+			glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
 
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));

@@ -5,6 +5,8 @@ layout(location = 0) uniform mat4 mvp;
 layout(location = 8) uniform mat4 model;
 layout(location = 2) uniform float time;
 layout(location = 11) uniform float bullettime;
+layout(location = 12) uniform vec4 bulletmult;
+layout(location = 13) uniform vec4 bulletmult2;
 layout(location = 7) uniform vec2 shiptrans; 
 
 // Per-vertex attributes
@@ -43,15 +45,28 @@ void main() {
 	gl_Position = mvp * vec4(posr.x + shiptrans.x, posr.y + shiptrans.y, (posr.z/25) + 0.55f, 1.0f);
 	}
 	if (ID == 3) {
-	mat4 ori = model;
-	ori[0] = ori0;
-	ori[1] = ori1;
-	ori[2] = ori2;
-	ori[3] = ori3;
-	vec4 posr = vec4(pos, 1);
-	posr.y += 0.5f;
-	posr = posr * ori;
-	gl_Position = mvp * vec4(posr.x + offset.x + 4 * traj.x * (bullettime - 5.6 - 0.272 * bulnum), posr.y + offset.y + 4 * -traj.y * (bullettime - 5.6 - 0.2718f * bulnum), (posr.z/25) + 0.48f, 1.0f);
+		mat4 ori = model;
+		ori[0] = ori0;
+		ori[1] = ori1;
+		ori[2] = ori2;
+		ori[3] = ori3;
+		vec4 posr = vec4(pos, 1);
+		posr.y += 0.5f;
+		posr = posr * ori;
+		float off = 0;
+		if (bulnum < 8) {
+			off = 20;
+		} else {
+			off = 0;
+		}
+		float mult = 0.1f;
+		if (bulnum < 4) {
+			mult = bulletmult[bulnum];
+			}
+		if (bulnum >= 4) {
+			mult = bulletmult2[bulnum - 4];
+		}
+		gl_Position = mvp * vec4(posr.x + offset.x + 1 * traj.x * mult, posr.y + offset.y + 1 * -traj.y * mult, (posr.z/25) + 0.48f, 1.0f);
 	}
     fragPos = move;
     fragNormal = normal;

@@ -1,28 +1,28 @@
 ﻿  main.cpp
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(428): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(429): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(430): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(431): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(432): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(433): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(434): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(437): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(438): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(441): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(442): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(471): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(472): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(475): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(476): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(479): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(480): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(483): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(484): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(522): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(526): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(568): warning C4018: '<': signed/unsigned mismatch
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(574): warning C4018: '<': signed/unsigned mismatch
-c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(592): warning C4018: '<': signed/unsigned mismatch
-LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-glew32s.lib(glew.obj) : warning LNK4204: 'C:\Users\Welho\Documents\Visual Studio 2013\Projects\3D_graphics_Project_modern_Opengl\visual studio\Debug\vc120.pdb' is missing debugging information for referencing module; linking object as if no debug info
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(435): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(436): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(439): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(440): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(443): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(444): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(473): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(474): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(477): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(478): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(481): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(482): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(485): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(486): warning C4305: '=': truncation from 'double' to 'tinyobj::real_t'
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(524): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(528): warning C4244: '=': conversion from 'double' to 'tinyobj::real_t', possible loss of data
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(570): warning C4018: '<': signed/unsigned mismatch
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(576): warning C4018: '<': signed/unsigned mismatch
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(594): warning C4018: '<': signed/unsigned mismatch
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(990): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(992): warning C4244: 'argument': conversion from 'float' to 'glm::tvec4<float,0>::length_type', possible loss of data
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(995): warning C4244: 'argument': conversion from 'float' to 'glm::tvec4<float,0>::length_type', possible loss of data
   ShadowMappingExercise.vcxproj -> C:\Users\Welho\Documents\Visual Studio 2013\Projects\3D_graphics_Project_modern_Opengl\visual studio\Debug\ShadowMappingExercise.exe
