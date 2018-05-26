@@ -31,7 +31,6 @@
 const int WIDTH = 800;
 const int HEIGHT = 600;
 int camera = 1;
-float x = 0.0f;
 
 glm::mat4 view;
 glm::mat4 projection;
@@ -67,6 +66,8 @@ bool wpress;
 bool apress;
 bool spress;
 bool dpress;
+
+bool bultexture = true;
 
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
@@ -337,7 +338,7 @@ void initBulletMesh(int bulnum, glm::vec2 t, glm::mat4 rot)
 	glm::vec3 v8 = glm::vec3(0.5f, 0.5f, 0.5f);
 
 
-	glm::vec3 c1 = glm::vec3(1.0f, 0.1f, 0.1f);
+	glm::vec3 c1 = glm::vec3(1.0f, 0.8f, 0.8f);
 	glm::vec3 n1 = normalize(glm::vec3(-1, -1, -1));
 	glm::vec3 n2 = normalize(glm::vec3(-1, -1, 1));
 	glm::vec3 n3 = normalize(glm::vec3(-1, 1, -1));
@@ -731,8 +732,8 @@ int main() {
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
 
-	GLuint texLandscape[3];
-	glGenTextures(3, texLandscape);
+	GLuint texLandscape[5];
+	glGenTextures(5, texLandscape);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[0]);
 
 	// Upload pixels into texture
@@ -772,7 +773,31 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+	pixels = stbi_load("bullet.png", &texwidth, &texheight, &texchannels, 3);
 
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[3]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	pixels = stbi_load("bullet2.png", &texwidth, &texheight, &texchannels, 3);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[4]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	////////////////////////// Load vertices of model
 	tinyobj::attrib_t attrib;
 	std::vector<tinyobj::shape_t> shapes;
@@ -890,11 +915,12 @@ int main() {
 	/////////////////// Create second camera
 	Camera secondCamera;
 	secondCamera.aspect = WIDTH / (float)HEIGHT;
-	secondCamera.position = glm::vec3(0.0f, 3.0f, 6.0f);
+	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
+		bultexture = !bultexture;
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		glfwPollEvents();
@@ -1010,8 +1036,6 @@ int main() {
 				bulletmult[i] += 0.1f;
 				bulletmult2[i] += 0.1f;
 			}
-			std::cout << bulletmult[2];
-			std::cout << " ";
 
 			// Set view position
 			glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(mainCamera.position));
@@ -1074,6 +1098,20 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texLandscape[2]);
 		glUniform1i(glGetUniformLocation(mainProgram, "snow"), texture_unit3);
 
+		if (bultexture) {
+			// Bind the first bullet texture to texture slot 4
+			GLint texture_unit4 = 4;
+			glActiveTexture(GL_TEXTURE0 + texture_unit4);
+			glBindTexture(GL_TEXTURE_2D, texLandscape[3]);
+			glUniform1i(glGetUniformLocation(mainProgram, "texbullet"), texture_unit4);
+		}
+		else {
+			// Bind the second bullet texture to texture slot 4
+			GLint texture_unit4 = 4;
+			glActiveTexture(GL_TEXTURE0 + texture_unit4);
+			glBindTexture(GL_TEXTURE_2D, texLandscape[4]);
+			glUniform1i(glGetUniformLocation(mainProgram, "texbullet"), texture_unit4);
+		}
 		// Set viewport size
 		glViewport(0, 0, WIDTH, HEIGHT);
 

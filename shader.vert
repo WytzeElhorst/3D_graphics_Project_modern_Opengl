@@ -3,7 +3,6 @@
 layout(location = 0) uniform mat4 mvp;
 layout(location = 8) uniform mat4 model;
 layout(location = 3) uniform float time;
-layout(location = 11) uniform float bullettime;
 layout(location = 12) uniform vec4 bulletmult;
 layout(location = 13) uniform vec4 bulletmult2;
 layout(location = 7) uniform vec2 shiptrans; 
@@ -77,7 +76,7 @@ void main() {
 		if (bulnum >= 4) {
 			mult = bulletmult2[bulnum - 4];
 		}
-		gl_Position = mvp * vec4(posr.x + offset.x + 1 * traj.x * mult, posr.y + offset.y + 1 * -traj.y * mult, (posr.z/25) + 0.48f, 1.0f);
+		gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4f * mult, posr.y + offset.y + -traj.y * 0.4f * mult, (posr.z/50) + 0.48f, 1.0f);
 	}
 	fragPos = move;
 	fragNormal = nor;
