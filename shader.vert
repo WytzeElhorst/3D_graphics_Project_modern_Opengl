@@ -68,7 +68,7 @@ void main() {
 	} else {
 	off = 0;
 	}
-	gl_Position = mvp * vec4(posr.x + offset.x + 4 * traj.x * (bullettime + off - 5.8f - 0.2721 * bulnum), posr.y + offset.y + 4 * -traj.y * (bullettime + off - 5.8f - 0.2721f * bulnum), (posr.z/25) + 0.48f, 1.0f);
+	gl_Position = mvp * vec4(posr.x + offset.x + 4 * traj.x * (bullettime + off - 5.85f - 0.2721 * bulnum), posr.y + offset.y + 4 * -traj.y * (bullettime + off - 5.85f - 0.2721f * bulnum), (posr.z/25) + 0.48f, 1.0f);
 	}
 	fragPos = move;
 	fragNormal = nor;
