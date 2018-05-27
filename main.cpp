@@ -30,11 +30,6 @@
 // Configuration
 const int WIDTH = 800;
 const int HEIGHT = 600;
-int camera = 1;
-
-glm::mat4 view;
-glm::mat4 projection;
-glm::mat4 model = glm::mat4(1.0f);
 
 // Per-vertex data
 struct Vertex {
@@ -49,6 +44,11 @@ struct Vertex {
 	glm::vec4 ori0, ori1, ori2, ori3;
 };
 
+//Variables
+double xpos, ypos;
+glm::mat4 view;
+glm::mat4 projection;
+glm::mat4 model = glm::mat4(1.0f);
 std::vector<Vertex> vertices;
 std::vector<Vertex> landscape;
 std::vector<Vertex> ship;
@@ -68,6 +68,19 @@ bool spress;
 bool dpress;
 
 bool bultexture = true;
+
+int NbVertY = 200, NbVertX = 200;
+std::vector<float> SurfaceVertices3f;
+std::vector<float> SurfaceNormals3f;
+std::vector<float> SurfaceColors3f;
+std::vector<float> SurfaceTexCoords2f;
+std::vector<unsigned int> SurfaceTriangles3ui;
+
+std::vector<float> ShipVertices3f;
+std::vector<float> ShipNormals3f;
+std::vector<float> ShipColors3f;
+std::vector<float> ShipTexCoords2f;
+std::vector<unsigned int> ShipTriangles3ui;
 
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
@@ -213,32 +226,6 @@ void cursorPosHandler(GLFWwindow* window, double xpos, double ypos)
 {
 	camCursorPosHandler(xpos, ypos);
 }
-
-//Vertices and texture coordinates for the terrain/water
-//later you can increase NbVert* to produce a more detailed mesh
-//you should know the index face set (triangles defined by vertex indices) from the last practical assignment
-int NbVertY = 200, NbVertX = 200;
-//vertices
-std::vector<float> SurfaceVertices3f;
-//normals
-std::vector<float> SurfaceNormals3f;
-//colors
-std::vector<float> SurfaceColors3f;
-//tex coords
-std::vector<float> SurfaceTexCoords2f;
-//triangle indices (three successive entries: n1, n2, n3 represent a triangle, each n* is an index representing a vertex.)
-std::vector<unsigned int> SurfaceTriangles3ui;
-
-//vertices
-std::vector<float> ShipVertices3f;
-//normals
-std::vector<float> ShipNormals3f;
-//colors
-std::vector<float> ShipColors3f;
-//tex coords
-std::vector<float> ShipTexCoords2f;
-//triangle indices (three successive entries: n1, n2, n3 represent a triangle, each n* is an index representing a vertex.)
-std::vector<unsigned int> ShipTriangles3ui;
 
 void initWeaponMesh()
 {
@@ -411,6 +398,7 @@ void initBulletMesh(int bulnum, glm::vec2 t, glm::mat4 rot)
 	bullets.push_back(ver6);
 	bullets.push_back(ver4);
 }
+
 glm::vec3 calculateNormal(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) {
 	return glm::normalize((glm::cross(glm::normalize(v1), glm::normalize(v2)) + glm::cross(glm::normalize(v1), glm::normalize(v3)) + glm::cross(glm::normalize(v2), glm::normalize(v3))) / 3.0f);
 }
@@ -620,6 +608,102 @@ void removeBullets() {
 	}
 }
 
+void ShootBullet() {
+	if (prevtime + 0.250 <= glfwGetTime()) {
+		initBulletMesh(nextbul, glm::vec2(xpos, ypos), model);
+		if (nextbul < 4) {
+			bulletmult[nextbul] = 0.0f;
+		}
+		if (nextbul >= 4) {
+			bulletmult2[nextbul - 4] = 0.0f;
+		}
+		nextbul++;
+		if (nextbul >= 8) {
+			nextbul = 0;
+		}
+		if (bullets.size() >= 36 * 8) {
+			bullets.erase(bullets.begin(), bullets.begin() + 36);
+		}
+		removeBullets();
+		addVertices(bullets);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
+		prevtime = glfwGetTime();
+	}
+	for (int i = 0; i < 4; i++) {
+		bulletmult[i] += 0.1f;
+		bulletmult2[i] += 0.1f;
+	}
+}
+
+void rotateWeapon(GLuint mainProgram) {
+	xpos += -(WIDTH / 2);
+	ypos += -(HEIGHT / 2);
+	xpos += -(shiplocation.x * (WIDTH / 2) / 2.0f);
+	ypos += (shiplocation.y * (HEIGHT / 2) / 1.6f);
+	float theta = 0.0f;
+	if (xpos > 0) {
+		theta = glm::acos(glm::dot(normalize(glm::vec2(xpos, ypos)), glm::vec2(0, -1)));
+	}
+	if (xpos < 0) {
+		theta = -glm::acos(glm::dot(normalize(glm::vec2(xpos, ypos)), glm::vec2(0, -1)));
+	}
+	model = glm::scale(glm::mat4(1.0f), glm::vec3(0.04, 0.1, 1));
+	model = glm::rotate(model, theta, glm::vec3(0, 0, 1));
+	glUniformMatrix4fv(glGetUniformLocation(mainProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+}
+
+void moveShip() {
+	if (apress) {
+		shiplocation.x += -speed;
+		if (shiplocation.x < -1.4f) {
+			shiplocation.x += speed;
+		}
+	}
+	if (dpress) {
+		shiplocation.x += speed;
+		if (shiplocation.x > 1.4f) {
+			shiplocation.x += -speed;
+		}
+	}
+	if (wpress) {
+		shiplocation.y += speed;
+		if (shiplocation.y > 1.4f) {
+			shiplocation.y += -speed;
+		}
+	}
+	if (spress) {
+		shiplocation.y += -speed;
+		if (shiplocation.y < -1.4f) {
+			shiplocation.y += speed;
+		}
+	}
+}
+
+void LoadTextures() {
+
+}
+
+void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
+	glm::mat4 mvp = mainCamera.vpMatrix();
+	glm::mat4 lightMVP = secondCamera.vpMatrix();
+	glUniformMatrix4fv(glGetUniformLocation(mainProgram, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+	glUniformMatrix4fv(glGetUniformLocation(mainProgram, "lightMVP"), 1, GL_FALSE, glm::value_ptr(lightMVP));
+	ShootBullet();
+	// Set view position
+	glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(mainCamera.position));
+
+	glUniform3fv(glGetUniformLocation(mainProgram, "lightPos"), 1, glm::value_ptr(secondCamera.position));
+
+	glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
+	glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
+
+	//bind shiplocation
+	glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
+
+	// Expose current time in shader uniform
+	glUniform1f(glGetUniformLocation(mainProgram, "time"), (float)(static_cast<int>(glfwGetTime() * 1000) % 20000) / 1000);
+}
+
 int main() {
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW!" << std::endl;
@@ -727,7 +811,7 @@ int main() {
 		}
 	}
 
-	//////////////////// Load a texture for exercise 5
+	//////////////////// Load textures
 	// Create Texture
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
@@ -799,85 +883,90 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	////////////////////////// Load vertices of model
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-	std::string err;
+	{
+		tinyobj::attrib_t attrib;
+		std::vector<tinyobj::shape_t> shapes;
+		std::vector<tinyobj::material_t> materials;
+		std::string err;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "scene.obj")) {
-		std::cerr << err << std::endl;
-		return EXIT_FAILURE;
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "scene.obj")) {
+			std::cerr << err << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 
 
 	//////////////////// Create Vertex Buffer Object
 	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
-
-	// Bind vertex data to shader inputs using their index (location)
-	// These bindings are stored in the Vertex Array Object
 	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	{
+		
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
-	// The position vectors should be retrieved from the specified Vertex Buffer Object with given offset and stride
-	// Stride is the distance in bytes between vertices
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, pos)));
-	glEnableVertexAttribArray(0);
+		// Bind vertex data to shader inputs using their index (location)
+		// These bindings are stored in the Vertex Array Object
+		
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
 
-	// The normals should be retrieved from the same Vertex Buffer Object (glBindBuffer is optional)
-	// The offset is different and the data should go to input 1 instead of 0
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
-	glEnableVertexAttribArray(1);
+		// The position vectors should be retrieved from the specified Vertex Buffer Object with given offset and stride
+		// Stride is the distance in bytes between vertices
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, pos)));
+		glEnableVertexAttribArray(0);
 
-	// color
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, color)));
-	glEnableVertexAttribArray(2);
+		// The normals should be retrieved from the same Vertex Buffer Object (glBindBuffer is optional)
+		// The offset is different and the data should go to input 1 instead of 0
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, normal)));
+		glEnableVertexAttribArray(1);
 
-	// UV
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, UV)));
-	glEnableVertexAttribArray(3);
+		// color
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, color)));
+		glEnableVertexAttribArray(2);
 
-	// ID
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ID)));
-	glEnableVertexAttribArray(4);
+		// UV
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, UV)));
+		glEnableVertexAttribArray(3);
 
-	// Bulnum
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bulnum)));
-	glEnableVertexAttribArray(5);
+		// ID
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ID)));
+		glEnableVertexAttribArray(4);
 
-	// trajectory
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, traj)));
-	glEnableVertexAttribArray(6);
+		// Bulnum
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, bulnum)));
+		glEnableVertexAttribArray(5);
 
-	// orientation
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori0)));
-	glEnableVertexAttribArray(8);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori1)));
-	glEnableVertexAttribArray(9);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori2)));
-	glEnableVertexAttribArray(10);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori3)));
-	glEnableVertexAttribArray(11);
+		// trajectory
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, traj)));
+		glEnableVertexAttribArray(6);
 
-	// offset
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, offset)));
-	glEnableVertexAttribArray(7);
+		// orientation
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori0)));
+		glEnableVertexAttribArray(8);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori1)));
+		glEnableVertexAttribArray(9);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori2)));
+		glEnableVertexAttribArray(10);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(11, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, ori3)));
+		glEnableVertexAttribArray(11);
 
+		// offset
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, offset)));
+		glEnableVertexAttribArray(7);
+	}
 	//////////////////// Create Shadow Texture
 	GLuint texShadow;
 	const int SHADOWTEX_WIDTH = 1024;
@@ -921,33 +1010,9 @@ int main() {
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
 		bultexture = !bultexture;
-		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		glfwPollEvents();
-		if (apress) {
-			shiplocation.x += -speed;
-			if (shiplocation.x < -1.4f) {
-				shiplocation.x += speed;
-			}
-		}
-		if (dpress) {
-			shiplocation.x += speed;
-			if (shiplocation.x > 1.4f) {
-				shiplocation.x += -speed;
-			}
-		}
-		if (wpress) {
-			shiplocation.y += speed;
-			if (shiplocation.y > 1.4f) {
-				shiplocation.y += -speed;
-			}
-		}
-		if (spress) {
-			shiplocation.y += -speed;
-			if (shiplocation.y < -1.4f) {
-				shiplocation.y += speed;
-			}
-		}
+		moveShip();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer
@@ -989,88 +1054,13 @@ int main() {
 
 		// Bind the shader
 		glUseProgram(mainProgram);
-		xpos += -(WIDTH / 2);
-		ypos += -(HEIGHT / 2);
-		xpos += -(shiplocation.x * (WIDTH / 2) / 2.0f);
-		ypos += (shiplocation.y * (HEIGHT / 2) / 1.6f);
-		float theta = 0.0f;
-		if (xpos > 0) {
-			theta = glm::acos(glm::dot(normalize(glm::vec2(xpos, ypos)), glm::vec2(0, -1)));
-		}
-		if (xpos < 0) {
-			theta = -glm::acos(glm::dot(normalize(glm::vec2(xpos, ypos)), glm::vec2(0, -1)));
-		}
 
-		if (camera == 1) {
-			updateCamera(mainCamera);
+		//rotate the weapon
+		rotateWeapon(mainProgram);
 
-			glm::mat4 mvp = mainCamera.vpMatrix();
-			
-			model = glm::scale(glm::mat4(1.0f), glm::vec3(0.04, 0.1, 1));
-			model = glm::rotate(model, theta, glm::vec3(0, 0, 1));
-			glm::mat4 lightMVP = secondCamera.vpMatrix();
-			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "lightMVP"), 1, GL_FALSE, glm::value_ptr(lightMVP));
-			if (prevtime + 0.250 <= glfwGetTime()) {
-				initBulletMesh(nextbul, glm::vec2(xpos, ypos), model);
-				if (nextbul < 4) {
-					bulletmult[nextbul] = 0.0f;
-				}
-				if (nextbul >= 4) {
-					bulletmult2[nextbul - 4] = 0.0f;
-				}
-				nextbul++;
-				if (nextbul >= 8) {
-					nextbul = 0;
-				}
-				if (bullets.size() >= 36 * 8) {
-					bullets.erase(bullets.begin(), bullets.begin() + 36);
-				}
-				removeBullets();
-				addVertices(bullets);
-				glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
-				prevtime = glfwGetTime();
-			}
-			for (int i = 0; i < 4; i++) {
-				bulletmult[i] += 0.1f;
-				bulletmult2[i] += 0.1f;
-			}
-
-			// Set view position
-			glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(mainCamera.position));
-
-			glUniform3fv(glGetUniformLocation(mainProgram, "lightPos"), 1, glm::value_ptr(secondCamera.position));
-
-			glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
-			glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
-
-			//bind shiplocation
-			glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
-
-			// Expose current time in shader uniform
-			glUniform1f(glGetUniformLocation(mainProgram, "time"), (float)(static_cast<int>(glfwGetTime() * 1000) % 20000) / 1000);
-			glUniform1f(glGetUniformLocation(mainProgram, "bullettime"), (float)(static_cast<int>(glfwGetTime() * 1000)) / 1000);
-		}
-		if (camera == 2) {
-			updateCamera(secondCamera);
-
-			glm::mat4 mvp = secondCamera.vpMatrix();
-			glm::mat4 lightMVP = mainCamera.vpMatrix();
-
-			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-			glUniformMatrix4fv(glGetUniformLocation(mainProgram, "lightMVP"), 1, GL_FALSE, glm::value_ptr(lightMVP));
-
-			// Set view position
-			glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(secondCamera.position));
-
-			glUniform3fv(glGetUniformLocation(mainProgram, "lightPos"), 1, glm::value_ptr(mainCamera.position));
-
-			glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
-
-			// Expose current time in shader uniform
-			glUniform1f(glGetUniformLocation(mainProgram, "time"), static_cast<float>(glfwGetTime()));
-		}
+		//add uniforms
+		updateCamera(mainCamera);
+		setUniforms(mainProgram, mainCamera, secondCamera);
 		// Bind vertex data
 		glBindVertexArray(vao);
 
@@ -1098,6 +1088,7 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texLandscape[2]);
 		glUniform1i(glGetUniformLocation(mainProgram, "snow"), texture_unit3);
 
+		// swap between two bullet textures
 		if (bultexture) {
 			// Bind the first bullet texture to texture slot 4
 			GLint texture_unit4 = 4;
