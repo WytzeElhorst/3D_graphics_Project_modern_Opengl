@@ -34,12 +34,13 @@ void main() {
 	vec3 nor = normal;
 	
 	if (ID == 0) {
-	move.y += -0.1*time;
-	move.z = 0.2*cos(3.1415*pos.x/2)*sin(3.1415*pos.y);
-	float dx = -0.31415f*sin(3.1415*pos.x/2)*sin(3.1415*pos.y);
-	float dy = 3.1415f*0.2f*cos(3.1415*pos.x/2)*cos(3.1415*pos.y);
-	vec3 tx = vec3(move.x, 0, dx);
-	vec3 ty = vec3(0, move.y, dy);
+	move.x += 0.8;
+	move.y += -0.2*time;
+	move.z = 0.3*cos(0.25*3.1415*pos.x)*sin(0.5*3.1415*pos.y);
+	float dx = -0.3*0.25*3.1415f*sin(0.25*3.1415*pos.x)*sin(0.5*3.1415*pos.y);
+	float dy = 3.1415f*0.15f*cos(0.25*3.1415*pos.x)*cos(0.5*3.1415*pos.y);
+	vec3 tx = vec3(1, 0, dx);
+	vec3 ty = vec3(0, 1, dy);
 	nor.y = cross(tx,ty).y;
 	nor.x = cross(tx,ty).x;
 	nor = normalize(nor);
@@ -48,7 +49,7 @@ void main() {
 	if (ID == 1) {
 	move.x += shiptrans.x;
 	move.y += shiptrans.y;
-	move.z += 0.55f;
+	move.z += 0.65f;
 	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 2) {
@@ -59,7 +60,7 @@ void main() {
 	nor = (norr * model).xyz;
 	move.x = posr.x + shiptrans.x;
 	move.y = posr.y + shiptrans.y;
-	move.z = (posr.z/25) + 0.48f;
+	move.z = (posr.z/25) + 0.58f;
 	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 3) {
@@ -84,7 +85,7 @@ void main() {
 		if (bulnum >= 4) {
 			mult = bulletmult2[bulnum - 4];
 		}
-		gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4f * mult, posr.y + offset.y + -traj.y * 0.4f * mult, (posr.z/50) + 0.48f, 1.0f);
+		gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4f * mult, posr.y + offset.y + -traj.y * 0.4f * mult, (posr.z/50) + 0.58f, 1.0f);
 	}
 	fragPos = move;
 	fragNormal = nor;

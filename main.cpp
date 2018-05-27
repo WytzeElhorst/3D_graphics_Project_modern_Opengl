@@ -250,9 +250,9 @@ void initWeaponMesh()
 	glm::vec3 n8 = normalize(glm::vec3(1, 1, 1));
 
 	glm::vec2 t1 = glm::vec2(0.0f, 0.0f);
-	glm::vec2 t2 = glm::vec2(0.0f, 1.0f);
-	glm::vec2 t3 = glm::vec2(1.0f, 0.0f);
-	glm::vec2 t4 = glm::vec2(1.0f, 1.0f);
+	glm::vec2 t2 = glm::vec2(0.0f, 0.2f);
+	glm::vec2 t3 = glm::vec2(0.2f, 0.0f);
+	glm::vec2 t4 = glm::vec2(0.2f, 0.2f);
 	
 	
 	Vertex ver1 = Vertex{ c1, v1, n1, t1, 2};
@@ -511,7 +511,7 @@ void initSurfaceMesh()
 			SurfaceNormals3f[count] = 0;
 			SurfaceColors3f[count] = 1;
 			count++;
-			SurfaceVertices3f[count] = (i - 0.2 * NbVertY) / 20;
+			SurfaceVertices3f[count] = (i - 0.1 * NbVertY) / 20;
 			SurfaceNormals3f[count] = 0;
 			SurfaceColors3f[count] = 1;
 			count++;
@@ -1014,7 +1014,7 @@ int main() {
 	/////////////////// Create second camera
 	Camera secondCamera;
 	secondCamera.aspect = WIDTH / (float)HEIGHT;
-	secondCamera.position = glm::vec3(0.0f, 6.0f, 8.0f);
+	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
 	// Main loop

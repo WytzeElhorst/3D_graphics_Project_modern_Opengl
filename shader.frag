@@ -54,7 +54,7 @@ void main() {
 		col.x = 1.8*fragPos.z + 0.25f;
 		col.z = 1.8*fragPos.z + 0.25f;
 		float phong = dot(fragNormal, lightDir);
-		float spec = pow(dot(fragNormal, h), 1);
+		float spec = pow(dot(fragNormal, h), 2);
 		outColor = vec4(textf*col*vec3(max((phong + spec)/2, 0.0f))*(1-shadow*0.7f), 1.0);
 	} 
 
@@ -62,14 +62,14 @@ void main() {
 	if (fragID == 1) {
 	vec3 text = vec3(texture(ship, fragUV).rgb);
 	float phong = dot(fragNormal, lightDir);
-	float spec = pow(dot(fragNormal, h), 10);
-	outColor = vec4(text*fragColor*vec3(max(phong + spec, 0.0) + 0.2f), 1.0);
+	float spec = pow(dot(fragNormal, h), 15);
+	outColor = vec4(text*fragColor*vec3(max(phong + 4*spec, 0.0) + 0.2f), 1.0);
 	}
 	if (fragID == 2) {
 	vec3 text = vec3(texture(metal, fragUV).rgb);
 	float phong = dot(fragNormal, lightDir);
-	float spec = pow(dot(fragNormal, h), 10);
-	outColor = vec4(text*fragColor*vec3(max(phong + spec, 0.0) + 0.2f), 1.0);
+	float spec = pow(dot(fragNormal, h), 15);
+	outColor = vec4(text*fragColor*vec3(max(phong + 4*spec, 0.0) + 0.2f), 1.0);
 	}
 	if (fragID == 3) {
 	vec3 text = vec3(texture(texbullet, fragUV).rgb);

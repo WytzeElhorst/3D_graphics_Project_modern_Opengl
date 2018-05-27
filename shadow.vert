@@ -31,41 +31,54 @@ void main() {
 
     // Pass position and normal through to fragment shader
 	vec3 move = pos;
+	vec3 nor = normal;
 	if (ID == 0) {
 	gl_Position = mvp * vec4(move, 1.0);
 	}
 	if (ID == 1) {
-	gl_Position = mvp * vec4(pos.x + shiptrans.x, pos.y + shiptrans.y, pos.z + 0.55f, 1.0f);
+	move.x += shiptrans.x;
+	move.y += shiptrans.y;
+	move.z += 0.65f;
+	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 2) {
 	vec4 posr = vec4(pos, 1);
 	posr.y += 0.5f;
 	posr = posr * model;
-	gl_Position = mvp * vec4(posr.x + shiptrans.x, posr.y + shiptrans.y, (posr.z/25) + 0.55f, 1.0f);
+	vec4 norr = vec4(pos, 1);
+	nor = (norr * model).xyz;
+	move.x = posr.x + shiptrans.x;
+	move.y = posr.y + shiptrans.y;
+	move.z = (posr.z/25) + 0.58f;
+	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 3) {
-		mat4 ori = model;
-		ori[0] = ori0;
-		ori[1] = ori1;
-		ori[2] = ori2;
-		ori[3] = ori3;
-		vec4 posr = vec4(pos, 1);
-		posr.y += 0.5f;
-		posr = posr * ori;
-		float off = 0;
-		if (bulnum < 8) {
-			off = 20;
-		} else {
-			off = 0;
-		}
-		float mult = 0.1f;
-		if (bulnum < 4) {
-			mult = bulletmult[bulnum];
-			}
-		if (bulnum >= 4) {
-			mult = bulletmult2[bulnum - 4];
-		}
-		gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4 *mult, posr.y + offset.y + -traj.y * 0.4 *mult, (posr.z/25) + 0.48f, 1.0f);
+		//disable bullet shadow
+		gl_Position = mvp * vec4(0, 0, -10, 1.0);
+		//enable bullet shadow
+		//mat4 ori = model;
+		//ori[0] = ori0;
+		//ori[1] = ori1;
+		//ori[2] = ori2;
+		//ori[3] = ori3;
+		//vec4 posr = vec4(pos, 1);
+		//posr.y += 0.5f;
+		//posr = posr * ori;
+		//float off = 0;
+		//if (bulnum < 8) {
+		//	off = 20;
+		//} else {
+		//	off = 0;
+		//}
+		//float mult = 0.1f;
+		//if (bulnum < 4) {
+		//	mult = bulletmult[bulnum];
+		//	}
+		//if (bulnum >= 4) {
+		//	mult = bulletmult2[bulnum - 4];
+		//}
+		//gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4 *mult, posr.y + offset.y + -traj.y * 0.4 *mult, (posr.z/25) + 0.58f, 1.0f);
+
 	}
     fragPos = move;
     fragNormal = normal;
