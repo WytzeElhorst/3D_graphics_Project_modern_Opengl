@@ -431,21 +431,18 @@ void initShipMesh()
 	ShipVertices3f[9] = 0;
 	ShipVertices3f[10] = 0.1;
 	ShipVertices3f[11] = -0.05;
-	glm::vec3 nor = calculateNormal(glm::vec3(0.5f, 0.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.1f, 0.2f, 0.0f));
-	ShipNormals3f[6] = nor.x;
-	ShipNormals3f[7] = nor.y;
-	ShipNormals3f[8] = nor.z;
-
-	ShipNormals3f[9] = -nor.x;
-	ShipNormals3f[10] = nor.y;
-	ShipNormals3f[11] = nor.z;
-	nor = calculateNormal(glm::vec3(-0.5f, 0.0f,- 0.5f), glm::vec3(0.5f, 0.0f, -0.5f), glm::vec3(0.0f, 0.2f, -0.1f));
-	ShipNormals3f[3] = -nor.x;
-	ShipNormals3f[4] = -nor.y;
-	ShipNormals3f[5] = nor.z;
-	ShipNormals3f[0] = nor.x;
-	ShipNormals3f[2] = -nor.y;
-	ShipNormals3f[3] = nor.z;
+	ShipNormals3f[0] = -1;
+	ShipNormals3f[1] = -0.3;
+	ShipNormals3f[2] = -0.3;
+	ShipNormals3f[3] = 1;
+	ShipNormals3f[4] = -0.3;
+	ShipNormals3f[5] = -0.3;
+	ShipNormals3f[6] = 0;
+	ShipNormals3f[7] = 0.3;
+	ShipNormals3f[8] = 1;
+	ShipNormals3f[9] = 0;
+	ShipNormals3f[10] = 1;
+	ShipNormals3f[11] = -0.3;
 
 	ShipTexCoords2f[0] = 0;
 	ShipTexCoords2f[1] = 0;
@@ -453,26 +450,26 @@ void initShipMesh()
 	ShipTexCoords2f[2] = 1;
 	ShipTexCoords2f[3] = 0;
 
-	ShipTexCoords2f[4] = 1;
-	ShipTexCoords2f[5] = 1;
+	ShipTexCoords2f[4] = 0.5;
+	ShipTexCoords2f[5] = 0.25;
 
-	ShipTexCoords2f[6] = 0;
+	ShipTexCoords2f[6] = 0.5;
 	ShipTexCoords2f[7] = 1;
 
-	ShipColors3f[0] = 0.3;
-	ShipColors3f[1] = 0.3;
+	ShipColors3f[0] = 1;
+	ShipColors3f[1] = 1;
 	ShipColors3f[2] = 1;
 
-	ShipColors3f[3] = 0.3;
-	ShipColors3f[4] = 0.3;
+	ShipColors3f[3] = 1;
+	ShipColors3f[4] = 1;
 	ShipColors3f[5] = 1;
 
-	ShipColors3f[6] = 0.3;
-	ShipColors3f[7] = 0.3;
+	ShipColors3f[6] = 1;
+	ShipColors3f[7] = 1;
 	ShipColors3f[8] = 1;
 
-	ShipColors3f[9] = 0.3;
-	ShipColors3f[10] = 0.3;
+	ShipColors3f[9] = 1;
+	ShipColors3f[10] = 1;
 	ShipColors3f[11] = 1;
 
 	ShipTriangles3ui[0] = 0;
@@ -591,7 +588,7 @@ void drawShip() {
 			glm::vec3 pos = glm::vec3(ShipVertices3f[3 * ver], ShipVertices3f[3 * ver + 1], ShipVertices3f[3 * ver + 2]);
 			glm::vec3 nor = glm::vec3(ShipNormals3f[3 * ver], ShipNormals3f[3 * ver + 1], ShipNormals3f[3 * ver + 2]);
 			glm::vec2 uv = glm::vec2(ShipTexCoords2f[2 * ver], ShipTexCoords2f[2 * ver + 1]);
-			ship.push_back(Vertex{ col, pos, nor, uv, 1 });
+			ship.push_back(Vertex{ col, pos, glm::normalize(nor), uv, 1 });
 		}
 	}
 	addVertices(ship);
@@ -816,8 +813,8 @@ int main() {
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
 
-	GLuint texLandscape[5];
-	glGenTextures(5, texLandscape);
+	GLuint texLandscape[6];
+	glGenTextures(6, texLandscape);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[0]);
 
 	// Upload pixels into texture
@@ -832,7 +829,7 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	pixels = stbi_load("metal.jpg", &texwidth, &texheight, &texchannels, 3);
+	pixels = stbi_load("ship.png", &texwidth, &texheight, &texchannels, 3);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[1]);
@@ -874,6 +871,19 @@ int main() {
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[4]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	pixels = stbi_load("metal.jpg", &texwidth, &texheight, &texchannels, 3);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[5]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
@@ -1004,7 +1014,7 @@ int main() {
 	/////////////////// Create second camera
 	Camera secondCamera;
 	secondCamera.aspect = WIDTH / (float)HEIGHT;
-	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
+	secondCamera.position = glm::vec3(0.0f, 6.0f, 8.0f);
 	secondCamera.forward = -secondCamera.position;
 
 	// Main loop
@@ -1080,13 +1090,19 @@ int main() {
 		GLint texture_unit2 = 2;
 		glActiveTexture(GL_TEXTURE0 + texture_unit2);
 		glBindTexture(GL_TEXTURE_2D, texLandscape[1]);
-		glUniform1i(glGetUniformLocation(mainProgram, "metal"), texture_unit2);
+		glUniform1i(glGetUniformLocation(mainProgram, "ship"), texture_unit2);
 
 		// Bind the snow to texture slot 3
 		GLint texture_unit3 = 3;
 		glActiveTexture(GL_TEXTURE0 + texture_unit3);
 		glBindTexture(GL_TEXTURE_2D, texLandscape[2]);
 		glUniform1i(glGetUniformLocation(mainProgram, "snow"), texture_unit3);
+
+		// Bind the metal to texture slot 5
+		GLint texture_unit5 = 5;
+		glActiveTexture(GL_TEXTURE0 + texture_unit5);
+		glBindTexture(GL_TEXTURE_2D, texLandscape[5]);
+		glUniform1i(glGetUniformLocation(mainProgram, "metal"), texture_unit5);
 
 		// swap between two bullet textures
 		if (bultexture) {

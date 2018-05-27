@@ -46,13 +46,21 @@ void main() {
 	gl_Position = mvp * vec4(move, 1.0);
 	}
 	if (ID == 1) {
-	gl_Position = mvp * vec4(pos.x + shiptrans.x, pos.y + shiptrans.y, pos.z + 0.55f, 1.0f);
+	move.x += shiptrans.x;
+	move.y += shiptrans.y;
+	move.z += 0.55f;
+	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 2) {
 	vec4 posr = vec4(pos, 1);
 	posr.y += 0.5f;
 	posr = posr * model;
-	gl_Position = mvp * vec4(posr.x + shiptrans.x, posr.y + shiptrans.y, (posr.z/25) + 0.48f, 1.0f);
+	vec4 norr = vec4(pos, 1);
+	nor = (norr * model).xyz;
+	move.x = posr.x + shiptrans.x;
+	move.y = posr.y + shiptrans.y;
+	move.z = (posr.z/25) + 0.48f;
+	gl_Position = mvp * vec4(move, 1.0f);
 	}
 	if (ID == 3) {
 		mat4 ori = model;

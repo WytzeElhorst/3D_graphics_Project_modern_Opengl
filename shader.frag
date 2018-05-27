@@ -7,6 +7,7 @@ layout(location = 6) uniform sampler2D landscape;
 layout(location = 9) uniform sampler2D metal;
 layout(location = 10) uniform sampler2D snow;
 layout(location = 14) uniform sampler2D texbullet;
+layout(location = 15) uniform sampler2D ship;
 layout(location = 3) uniform float time;
 
 layout(location = 4) uniform mat4 lightMVP;
@@ -58,11 +59,17 @@ void main() {
 	} 
 
 	//Ships with big specularity
-	if (fragID == 1 || fragID == 2) {
+	if (fragID == 1) {
+	vec3 text = vec3(texture(ship, fragUV).rgb);
+	float phong = dot(fragNormal, lightDir);
+	float spec = pow(dot(fragNormal, h), 10);
+	outColor = vec4(text*fragColor*vec3(max(phong + spec, 0.0) + 0.2f), 1.0);
+	}
+	if (fragID == 2) {
 	vec3 text = vec3(texture(metal, fragUV).rgb);
 	float phong = dot(fragNormal, lightDir);
-	float spec = pow(dot(fragNormal, h), 5);
-	outColor = vec4(text*fragColor*vec3(max(phong + 10*spec, 0.0)), 1.0);
+	float spec = pow(dot(fragNormal, h), 10);
+	outColor = vec4(text*fragColor*vec3(max(phong + spec, 0.0) + 0.2f), 1.0);
 	}
 	if (fragID == 3) {
 	vec3 text = vec3(texture(texbullet, fragUV).rgb);
