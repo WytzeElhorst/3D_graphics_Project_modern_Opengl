@@ -511,7 +511,7 @@ void initSurfaceMesh()
 			SurfaceNormals3f[count] = 0;
 			SurfaceColors3f[count] = 1;
 			count++;
-			SurfaceVertices3f[count] = (i - 0.1 * NbVertY) / 20;
+			SurfaceVertices3f[count] = (i - 0.2 * NbVertY) / 20;
 			SurfaceNormals3f[count] = 0;
 			SurfaceColors3f[count] = 1;
 			count++;
