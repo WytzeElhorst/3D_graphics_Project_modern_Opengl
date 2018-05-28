@@ -43,4 +43,5 @@ c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(775): warning C4244: 'argument': conversion from 'float' to 'glm::tvec4<float,0>::length_type', possible loss of data
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(850): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(852): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\welho\documents\visual studio 2013\projects\3d_graphics_project_modern_opengl\main.cpp(858): warning C4305: '=': truncation from 'double' to 'float'
   ShadowMappingExercise.vcxproj -> C:\Users\Welho\Documents\Visual Studio 2013\Projects\3D_graphics_Project_modern_Opengl\visual studio\Debug\ShadowMappingExercise.exe

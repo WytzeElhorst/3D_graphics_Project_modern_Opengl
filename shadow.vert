@@ -6,6 +6,11 @@ layout(location = 8) uniform mat4 model;
 layout(location = 2) uniform float time;
 layout(location = 12) uniform vec4 bulletmult;
 layout(location = 13) uniform vec4 bulletmult2;
+layout(location = 16) uniform vec4 enemydata0;
+layout(location = 17) uniform vec4 enemydata1;
+layout(location = 18) uniform vec4 enemydata2;
+layout(location = 19) uniform vec4 enemydata3;
+layout(location = 20) uniform vec4 enemydata4;
 layout(location = 7) uniform vec2 shiptrans; 
 
 // Per-vertex attributes
@@ -79,6 +84,30 @@ void main() {
 		//}
 		//gl_Position = mvp * vec4(posr.x + offset.x + traj.x * 0.4 *mult, posr.y + offset.y + -traj.y * 0.4 *mult, (posr.z/25) + 0.58f, 1.0f);
 
+	}
+	if (ID == 5) {
+		if (bulnum == 0) {
+			move.x += enemydata0.x;
+			move.y += enemydata0.y;
+		}
+		if (bulnum == 1) {
+			move.x += enemydata1.x;
+			move.y += enemydata1.y;
+		}
+		if (bulnum == 2) {
+			move.x += enemydata2.x;
+			move.y += enemydata2.y;
+		}
+		if (bulnum == 3) {
+			move.x += enemydata3.x;
+			move.y += enemydata3.y;
+		}
+		if (bulnum == 4) {
+			move.x += enemydata4.x;
+			move.y += enemydata4.y;
+		}
+		move.z += 0.58f;
+		gl_Position = mvp * vec4(move, 1.0f);
 	}
     fragPos = move;
     fragNormal = normal;

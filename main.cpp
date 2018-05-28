@@ -855,7 +855,7 @@ void UpdateEnemies() {
 				enemydata[i].w = 1;
 				enemydata[i].z = maxhp;
 				enemydata[i].x = r2;
-				enemydata[i].y = 3;
+				enemydata[i].y = 3.6;
 			}
 		}
 		// if active, move
@@ -1285,6 +1285,11 @@ int main() {
 			glUniformMatrix4fv(glGetUniformLocation(shadowProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			glUniform4fv(glGetUniformLocation(shadowProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
 			glUniform4fv(glGetUniformLocation(shadowProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata0"), 1, glm::value_ptr(enemydata[0]));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata1"), 1, glm::value_ptr(enemydata[1]));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata2"), 1, glm::value_ptr(enemydata[2]));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata3"), 1, glm::value_ptr(enemydata[3]));
+			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata4"), 1, glm::value_ptr(enemydata[4]));
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(shadowProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
 
