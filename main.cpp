@@ -28,8 +28,8 @@
 #include <vector>
 
 // Configuration
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1200;
+const int HEIGHT = 900;
 
 // Per-vertex data
 struct Vertex {
@@ -61,13 +61,17 @@ glm::vec4 bulletmult;
 glm::vec4 bulletmult2;
 double prevtime = 0;
 
+
+//shit variables
 glm::vec2 shiplocation;
 float speed = 0.01f;
+int hp = 5;
 bool wpress;
 bool apress;
 bool spress;
 bool dpress;
 
+//decides which bullettexture to use
 bool bultexture = true;
 
 int NbVertY = 200, NbVertX = 200;
@@ -863,6 +867,7 @@ void UpdateEnemies() {
 	}
 }
 
+//checks collision between objects
 void checkCollision() {
 	for (int s = 0; s < 5; s++) {
 		if (enemydata[s].w == 1) {
@@ -878,11 +883,15 @@ void checkCollision() {
 						if (i >= 4) {
 							bulletmult2[i - 4] += 10;
 						}
-						std::cout << "collide";
 					}
 				}
 			}
-
+			if (shiplocation.x <= enemydata[s].x + 0.1f && shiplocation.x >= enemydata[s].x - 0.1f) {
+				if (shiplocation.y <= enemydata[s].y + 0.15f && shiplocation.y >= enemydata[s].y - 0.15f) {
+					enemydata[s].z += -3;
+					hp += -1;
+				}
+			}
 		}
 	}
 }
