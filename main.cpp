@@ -99,8 +99,10 @@ glm::vec4 enemydata1 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata2 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata3 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-float spawnrate = 0.002f;
-bool collision = false;
+float spawnrate = 0.004f;
+float enemyspeed = 0.01f;
+float maxhp = 3;
+
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
 	obs.push_back(v1);
@@ -851,17 +853,24 @@ void UpdateEnemies() {
 				r2 += -50;
 				r2 = r2 / 33;
 				enemydata[i].w = 1;
-				enemydata[i].z = 3;
+				enemydata[i].z = maxhp;
 				enemydata[i].x = r2;
-				enemydata[i].y = 4;
+				enemydata[i].y = 3;
 			}
 		}
 		// if active, move
 		if (enemydata[i].w == 1) {
-			enemydata[i].y += -0.005;
+			if (enemydata[i].y <= shiplocation.y + 1) {
+				glm::vec2 enemypos = glm::vec2(enemydata[i].x, enemydata[i].y);
+				glm::vec2 move = normalize(shiplocation - enemypos);
+				enemydata[i].x += enemyspeed * move.x;
+				enemydata[i].y += enemyspeed * move.y;
+			}
+			else {
+				enemydata[i].y += -enemyspeed;
+			}
 			if (enemydata[i].y <= -2) {
 				enemydata[i].w = 0;
-				std::cout << "reset";
 			}
 		}
 	}
@@ -873,15 +882,16 @@ void checkCollision() {
 		if (enemydata[s].w == 1) {
 			for (int i = 0; i < 8; i++) {
 				glm::vec2 bulpos = bulletPosition(i);
-				bulpos.y = bulpos.y;
-				if (bulpos.x <= enemydata[s].x + 0.1f && bulpos.x >= enemydata[s].x - 0.1f) {
-					if (bulpos.y <= enemydata[s].y + 0.15f && bulpos.y >= enemydata[s].y - 0.15f) {
-						enemydata[s].z += -1;
-						if (i < 4) {
-							bulletmult[i] += 10;
-						}
-						if (i >= 4) {
-							bulletmult2[i - 4] += 10;
+				if (!(bulpos.x == 0 && bulpos.y == 0)) {
+					if (bulpos.x <= enemydata[s].x + 0.1f && bulpos.x >= enemydata[s].x - 0.1f) {
+						if (bulpos.y <= enemydata[s].y + 0.15f && bulpos.y >= enemydata[s].y - 0.15f) {
+							enemydata[s].z += -1;
+							if (i < 4) {
+								bulletmult[i] += 10;
+							}
+							if (i >= 4) {
+								bulletmult2[i - 4] += 10;
+							}
 						}
 					}
 				}
@@ -919,6 +929,7 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 
 	// Expose current time in shader uniform
 	glUniform1f(glGetUniformLocation(mainProgram, "time"), (float)(static_cast<int>(glfwGetTime() * 1000) % 20000) / 1000);
+	glUniform1f(glGetUniformLocation(mainProgram, "hp"), (float)(static_cast<int>(maxhp)));
 }
 
 int main() {

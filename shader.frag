@@ -8,6 +8,12 @@ layout(location = 9) uniform sampler2D metal;
 layout(location = 10) uniform sampler2D snow;
 layout(location = 14) uniform sampler2D texbullet;
 layout(location = 15) uniform sampler2D ship;
+layout(location = 16) uniform vec4 enemydata0;
+layout(location = 17) uniform vec4 enemydata1;
+layout(location = 18) uniform vec4 enemydata2;
+layout(location = 19) uniform vec4 enemydata3;
+layout(location = 20) uniform vec4 enemydata4;
+layout(location = 21) uniform float hp;
 layout(location = 3) uniform float time;
 
 layout(location = 4) uniform mat4 lightMVP;
@@ -22,6 +28,7 @@ in vec3 fragNormal; // World-space normal
 in vec3 fragColor;
 in vec2 fragUV;
 flat in int fragID;
+flat in int fragNum;
 
 void main() {
 	// Output the normal as color
@@ -76,9 +83,30 @@ void main() {
 	outColor = vec4(text*fragColor, 1.0);
 	}
 	if (fragID == 5) {
+	vec3 col = fragColor;
+	if (fragNum == 0) {
+	col.y *= enemydata0.z / hp; //sorry for bad code ethics
+	col.z *= enemydata0.z / hp;
+	}
+	if (fragNum == 1) {
+	col.y *= enemydata1.z / hp;
+	col.z *= enemydata1.z / hp;
+	}
+	if (fragNum == 2) {
+	col.y *= enemydata2.z / hp;
+	col.z *= enemydata2.z / hp;
+	}
+	if (fragNum == 3) {
+	col.y *= enemydata3.z / hp;
+	col.z *= enemydata3.z / hp;
+	}
+	if (fragNum == 4) {
+	col.y *= enemydata4.z / hp;
+	col.z *= enemydata4.z / hp;
+	}
 	vec3 text = vec3(texture(metal, fragUV).rgb);
 	float phong = dot(fragNormal, lightDir);
 	float spec = pow(dot(fragNormal, h), 15);
-	outColor = vec4(text*fragColor*vec3(max(phong + 4*spec, 0.0) + 0.2f), 1.0);
+	outColor = vec4(text*col*vec3(max(phong + 4*spec, 0.0) + 0.2f), 1.0);
 	}
 }

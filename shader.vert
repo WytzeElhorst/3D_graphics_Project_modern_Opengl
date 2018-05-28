@@ -32,6 +32,7 @@ out vec3 fragNormal;
 out vec3 fragColor;
 out vec2 fragUV;
 flat out int fragID;
+flat out int fragNum;
 
 void main() {
 	// Transform 3D position into on-screen position
@@ -121,5 +122,6 @@ void main() {
 	fragColor = color;
 	fragUV = UV;
 	fragID = ID;
+	fragNum = bulnum;
 
 }
