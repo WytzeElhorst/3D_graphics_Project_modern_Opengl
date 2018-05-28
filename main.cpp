@@ -52,6 +52,7 @@ glm::mat4 model = glm::mat4(1.0f);
 std::vector<Vertex> vertices;
 std::vector<Vertex> landscape;
 std::vector<Vertex> ship;
+std::vector<Vertex> enemyShip;
 std::vector<Vertex> bullets;
 float nextbul = 0;
 bool is8 = false;
@@ -82,6 +83,20 @@ std::vector<float> ShipColors3f;
 std::vector<float> ShipTexCoords2f;
 std::vector<unsigned int> ShipTriangles3ui;
 
+//enemy data
+std::vector<float> eShipVertices3f;
+std::vector<float> eShipNormals3f;
+std::vector<float> eShipColors3f;
+std::vector<float> eShipTexCoords2f;
+std::vector<unsigned int> eShipTriangles3ui;
+std::vector<glm::vec4> enemydata;
+glm::vec4 enemydata0 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 enemydata1 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 enemydata2 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 enemydata3 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+float spawnrate = 0.002f;
+bool collision = false;
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
 	obs.push_back(v1);
@@ -403,6 +418,15 @@ glm::vec3 calculateNormal(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) {
 	return glm::normalize((glm::cross(glm::normalize(v1), glm::normalize(v2)) + glm::cross(glm::normalize(v1), glm::normalize(v3)) + glm::cross(glm::normalize(v2), glm::normalize(v3))) / 3.0f);
 }
 
+void addEnemyData() {
+	enemydata.resize(5);
+	enemydata.push_back(enemydata0);
+	enemydata.push_back(enemydata1);
+	enemydata.push_back(enemydata2);
+	enemydata.push_back(enemydata3);
+	enemydata.push_back(enemydata4);
+}
+
 void initShipMesh()
 {
 	//vertices with 3 coordinates
@@ -487,6 +511,95 @@ void initShipMesh()
 	ShipTriangles3ui[9] = 2;
 	ShipTriangles3ui[10] = 3;
 	ShipTriangles3ui[11] = 1;
+
+
+}
+
+void initEnemyShipMesh()
+{
+	//vertices with 3 coordinates
+	eShipVertices3f.resize(12);
+	//normals with 3 coordinates
+	eShipNormals3f.resize(12);
+	//texture coords per vertex
+	eShipTexCoords2f.resize(8);
+	//triangles (2 per default)
+	eShipTriangles3ui.resize(12);
+	//per vertex colors 
+	eShipColors3f.resize(12);
+	//define coords
+	eShipVertices3f[0] = -0.1;
+	eShipVertices3f[1] = 0.1;
+	eShipVertices3f[2] = -0.05;
+
+	eShipVertices3f[3] = 0.1;
+	eShipVertices3f[4] = 0.1;
+	eShipVertices3f[5] = -0.05;
+
+	eShipVertices3f[6] = 0;
+	eShipVertices3f[7] = 0.1;
+	eShipVertices3f[8] = 0.05;
+
+	eShipVertices3f[9] = 0;
+	eShipVertices3f[10] = -0.1;
+	eShipVertices3f[11] = -0.05;
+	
+	eShipNormals3f[0] = -1;
+	eShipNormals3f[1] = 0.3;
+	eShipNormals3f[2] = -0.3;
+	eShipNormals3f[3] = 1;
+	eShipNormals3f[4] = 0.3;
+	eShipNormals3f[5] = -0.3;
+	eShipNormals3f[6] = 0;
+	eShipNormals3f[7] = -0.3;
+	eShipNormals3f[8] = 1;
+	eShipNormals3f[9] = 0;
+	eShipNormals3f[10] = -1;
+	eShipNormals3f[11] = -0.3;
+
+	eShipTexCoords2f[0] = 0;
+	eShipTexCoords2f[1] = 0;
+
+	eShipTexCoords2f[2] = 1;
+	eShipTexCoords2f[3] = 0;
+
+	eShipTexCoords2f[4] = 0.5;
+	eShipTexCoords2f[5] = 0.25;
+
+	eShipTexCoords2f[6] = 0.5;
+	eShipTexCoords2f[7] = 1;
+
+	eShipColors3f[0] = 1;
+	eShipColors3f[1] = 1;
+	eShipColors3f[2] = 1;
+
+	eShipColors3f[3] = 1;
+	eShipColors3f[4] = 1;
+	eShipColors3f[5] = 1;
+
+	eShipColors3f[6] = 1;
+	eShipColors3f[7] = 1;
+	eShipColors3f[8] = 1;
+
+	eShipColors3f[9] = 1;
+	eShipColors3f[10] = 1;
+	eShipColors3f[11] = 1;
+
+	eShipTriangles3ui[0] = 0;
+	eShipTriangles3ui[1] = 2;
+	eShipTriangles3ui[2] = 1;
+
+	eShipTriangles3ui[3] = 0;
+	eShipTriangles3ui[4] = 1;
+	eShipTriangles3ui[5] = 3;
+
+	eShipTriangles3ui[6] = 0;
+	eShipTriangles3ui[7] = 3;
+	eShipTriangles3ui[8] = 2;
+
+	eShipTriangles3ui[9] = 2;
+	eShipTriangles3ui[10] = 3;
+	eShipTriangles3ui[11] = 1;
 
 
 }
@@ -594,6 +707,26 @@ void drawShip() {
 	addVertices(ship);
 }
 
+void drawEnemyShip() {
+	for (int n = 0; n < 5; n++) {
+		for (int t = 0; t < eShipTriangles3ui.size(); t += 3) {
+			Vertex vert;
+			int count = 0;
+			//first vertex
+			for (int i = 0; i < 3; i++) {
+				int index = i + t;
+				int ver = eShipTriangles3ui[index];
+				glm::vec3 col = glm::vec3(eShipColors3f[3 * ver], eShipColors3f[3 * ver + 1], eShipColors3f[3 * ver + 2]);
+				glm::vec3 pos = glm::vec3(eShipVertices3f[3 * ver], eShipVertices3f[3 * ver + 1], eShipVertices3f[3 * ver + 2]);
+				glm::vec3 nor = glm::vec3(eShipNormals3f[3 * ver], eShipNormals3f[3 * ver + 1], eShipNormals3f[3 * ver + 2]);
+				glm::vec2 uv = glm::vec2(eShipTexCoords2f[2 * ver], eShipTexCoords2f[2 * ver + 1]);
+				enemyShip.push_back(Vertex{ col, pos, glm::normalize(nor), uv, 5, n});
+			}
+		}
+	}
+	addVertices(enemyShip);
+}
+
 void removeBullets() {
 	for (int i = vertices.size() - 1; i >= 0; i += -1) {
 		if (vertices[i].ID == 3) {
@@ -603,6 +736,27 @@ void removeBullets() {
 			return;
 		}
 	}
+}
+
+glm::vec2 bulletPosition(int num) {
+	glm::vec2 res;
+	glm::vec2 traj;
+	glm::vec2 offset;
+	for (int i = 0; i < bullets.size(); i++) {
+		if (bullets[i].bulnum == num) {
+			traj = bullets[i].traj;
+			traj.y = -traj.y;
+			offset = bullets[i].offset;
+			break;
+		}
+	}
+	if (num < 4) {
+		res = offset + 0.4f * traj * bulletmult[num];
+	}
+	if (num >= 4) {
+		res = offset + 0.4f * traj * bulletmult2[num - 4];
+	}
+	return res;
 }
 
 void ShootBullet() {
@@ -676,8 +830,61 @@ void moveShip() {
 	}
 }
 
-void LoadTextures() {
+void UpdateEnemies() {
+	for (int i = 0; i < 5; i++) {
+		//if health = 0, set inactive
+		if (enemydata[i].z <= 0.0f) {
+			enemydata[i].w = 0;
+		}
+		//if inactive, remove from screen
+		if (enemydata[i].w == 0.0f) {
+			enemydata[i].x = -10;
+			enemydata[i].y = -10;
+			//check for spawn
+			float r1 = rand() % 1000;
+			if (r1 <= 1000 * spawnrate) {
+				float r2 = rand() % 100;
+				r2 += -50;
+				r2 = r2 / 33;
+				enemydata[i].w = 1;
+				enemydata[i].z = 3;
+				enemydata[i].x = r2;
+				enemydata[i].y = 4;
+			}
+		}
+		// if active, move
+		if (enemydata[i].w == 1) {
+			enemydata[i].y += -0.005;
+			if (enemydata[i].y <= -2) {
+				enemydata[i].w = 0;
+				std::cout << "reset";
+			}
+		}
+	}
+}
 
+void checkCollision() {
+	for (int s = 0; s < 5; s++) {
+		if (enemydata[s].w == 1) {
+			for (int i = 0; i < 8; i++) {
+				glm::vec2 bulpos = bulletPosition(i);
+				bulpos.y = bulpos.y;
+				if (bulpos.x <= enemydata[s].x + 0.1f && bulpos.x >= enemydata[s].x - 0.1f) {
+					if (bulpos.y <= enemydata[s].y + 0.15f && bulpos.y >= enemydata[s].y - 0.15f) {
+						enemydata[s].z += -1;
+						if (i < 4) {
+							bulletmult[i] += 10;
+						}
+						if (i >= 4) {
+							bulletmult2[i - 4] += 10;
+						}
+						std::cout << "collide";
+					}
+				}
+			}
+
+		}
+	}
 }
 
 void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
@@ -685,7 +892,6 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glm::mat4 lightMVP = secondCamera.vpMatrix();
 	glUniformMatrix4fv(glGetUniformLocation(mainProgram, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
 	glUniformMatrix4fv(glGetUniformLocation(mainProgram, "lightMVP"), 1, GL_FALSE, glm::value_ptr(lightMVP));
-	ShootBullet();
 	// Set view position
 	glUniform3fv(glGetUniformLocation(mainProgram, "viewPos"), 1, glm::value_ptr(mainCamera.position));
 
@@ -693,6 +899,11 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 
 	glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult"), 1, glm::value_ptr(bulletmult));
 	glUniform4fv(glGetUniformLocation(mainProgram, "bulletmult2"), 1, glm::value_ptr(bulletmult2));
+	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata0"), 1, glm::value_ptr(enemydata[0]));
+	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata1"), 1, glm::value_ptr(enemydata[1]));
+	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata2"), 1, glm::value_ptr(enemydata[2]));
+	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata3"), 1, glm::value_ptr(enemydata[3]));
+	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata4"), 1, glm::value_ptr(enemydata[4]));
 
 	//bind shiplocation
 	glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
@@ -706,11 +917,14 @@ int main() {
 		std::cerr << "Failed to initialize GLFW!" << std::endl;
 		return EXIT_FAILURE;
 	}
+	addEnemyData();
 	initSurfaceMesh();
 	drawSurface();
 	initShipMesh();
 	drawShip();
 	initWeaponMesh();
+	initEnemyShipMesh();
+	drawEnemyShip();
 	//////////////////// Create window and OpenGL 4.3 debug context
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -1023,6 +1237,8 @@ int main() {
 		glfwGetCursorPos(window, &xpos, &ypos);
 		glfwPollEvents();
 		moveShip();
+		checkCollision();
+		UpdateEnemies();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer
@@ -1067,6 +1283,7 @@ int main() {
 
 		//rotate the weapon
 		rotateWeapon(mainProgram);
+		ShootBullet();
 
 		//add uniforms
 		updateCamera(mainCamera);

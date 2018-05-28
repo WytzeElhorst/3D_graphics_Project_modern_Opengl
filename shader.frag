@@ -75,4 +75,10 @@ void main() {
 	vec3 text = vec3(texture(texbullet, fragUV).rgb);
 	outColor = vec4(text*fragColor, 1.0);
 	}
+	if (fragID == 5) {
+	vec3 text = vec3(texture(metal, fragUV).rgb);
+	float phong = dot(fragNormal, lightDir);
+	float spec = pow(dot(fragNormal, h), 15);
+	outColor = vec4(text*fragColor*vec3(max(phong + 4*spec, 0.0) + 0.2f), 1.0);
+	}
 }
