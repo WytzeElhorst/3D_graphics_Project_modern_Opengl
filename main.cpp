@@ -26,6 +26,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "visual studio/particle_generator.h"
 
 // Configuration
 const int WIDTH = 1200;
@@ -60,6 +61,8 @@ float bullettime = 0;
 glm::vec4 bulletmult;
 glm::vec4 bulletmult2;
 double prevtime = 0;
+double particleTime = 0;
+ParticleGenerator   *Particles;
 
 
 //shit variables
@@ -932,6 +935,39 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glUniform1f(glGetUniformLocation(mainProgram, "hp"), (float)(static_cast<int>(maxhp)));
 }
 
+void InitParticles(GLuint texLandscape[7])
+{
+	GLuint particleProgram = glCreateProgram();
+	std::string vertexShaderCode = readFile("particle.vert"); 		
+	const char* vertexShaderCodePtr = vertexShaderCode.data();
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderCodePtr, nullptr);
+	glCompileShader(vertexShader);
+
+	std::string fragmentShaderCode = readFile("particle.frag");
+	const char* fragmentShaderCodePtr = fragmentShaderCode.data();
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderCodePtr, nullptr);
+	glCompileShader(fragmentShader);
+
+	glAttachShader(particleProgram, vertexShader);
+	glAttachShader(particleProgram, fragmentShader);
+	glLinkProgram(particleProgram);
+	
+	//// Create particles
+	Particles = new ParticleGenerator(
+		particleProgram,
+		texLandscape[6],
+		500
+	);
+}
+
+void UpdateParticles()
+{
+	Particles->Update(glfwGetTime() - particleTime, glm::vec2(0, 0), 2, glm::vec2(0, 0));
+	particleTime = glfwGetTime();
+}
+
 int main() {
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW!" << std::endl;
@@ -1047,8 +1083,8 @@ int main() {
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
 
-	GLuint texLandscape[6];
-	glGenTextures(6, texLandscape);
+	GLuint texLandscape[7];
+	glGenTextures(7, texLandscape);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[0]);
 
 	// Upload pixels into texture
@@ -1118,6 +1154,20 @@ int main() {
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[5]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+
+	pixels = stbi_load("particle.png", &texwidth, &texheight, &texchannels, 3);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
@@ -1251,6 +1301,8 @@ int main() {
 	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
+	InitParticles(texLandscape);
+
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
 		bultexture = !bultexture;
@@ -1259,6 +1311,7 @@ int main() {
 		moveShip();
 		checkCollision();
 		UpdateEnemies();
+		UpdateParticles();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer

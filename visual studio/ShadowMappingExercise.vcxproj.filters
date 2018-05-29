@@ -13,6 +13,9 @@
     <None Include="..\shadow.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="particle.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -29,10 +32,19 @@
     <ClInclude Include="..\camera.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="particle_generator.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\particle_generator.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.vert">
+      <Filter>Shaders</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
