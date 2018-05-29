@@ -14,6 +14,7 @@ layout(location = 18) uniform vec4 enemydata2;
 layout(location = 19) uniform vec4 enemydata3;
 layout(location = 20) uniform vec4 enemydata4;
 layout(location = 21) uniform float hp;
+layout(location = 22) uniform sampler2D texToon;
 layout(location = 3) uniform float time;
 
 layout(location = 4) uniform mat4 lightMVP;
@@ -62,7 +63,7 @@ void main() {
 		col.z = 1.8*fragPos.z + 0.25f;
 		float phong = dot(fragNormal, lightDir);
 		float spec = pow(dot(fragNormal, h), 2);
-		outColor = vec4(textf*col*vec3(max((phong + spec)/2, 0.0f))*(1-shadow*0.7f), 1.0);
+		outColor = vec4(textf*col*vec3(max((phong + spec)/2, 0.0f))*(1-shadow*0.4f), 1.0);
 	} 
 
 	//Ships with big specularity
@@ -81,6 +82,35 @@ void main() {
 	if (fragID == 3) {
 	vec3 text = vec3(texture(texbullet, fragUV).rgb);
 	outColor = vec4(text*fragColor, 1.0);
+	}
+	if (fragID == 6) {
+	vec3 viewDir = normalize(viewPos - fragPos);
+	vec3 lightDir = normalize(lightPos - fragPos);
+	vec3 h = normalize(lightDir + viewDir);
+	float diff = dot(fragNormal, lightDir);
+	float spec = pow(dot(normalize(fragNormal), h), 16);
+	if (spec > 0.2) {
+	spec = 1.0;
+	} else {
+	spec = 0.0;}
+	float res = (diff + spec)/2;
+	if (res < 0.25) {
+	res = 0;
+	} else { 
+		if (res < 0.5) {
+		res = 0.25;
+		} else {
+		if (res < 0.75) {
+			res = 0.5;
+			} else {
+				if (res < 1) {
+				res = 0.75;
+				}
+			}
+		}
+	}
+	float dist = distance(viewPos, fragPos);
+    outColor = texture(texToon, vec2 ( diff , ((normalize(viewPos - fragPos)))));
 	}
 	if (fragID == 5) {
 	vec3 col = fragColor;
