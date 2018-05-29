@@ -1244,8 +1244,8 @@ int main() {
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
 
-	GLuint texLandscape[7];
-	glGenTextures(7, texLandscape);
+	GLuint texLandscape[8];
+	glGenTextures(8, texLandscape);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[0]);
 
 	// Upload pixels into texture
@@ -1326,12 +1326,23 @@ int main() {
 
 	pixels = stbi_load("toon_map.png", &texwidth, &texheight, &texchannels, 3);
 
-	pixels = stbi_load("particle2.png", &texwidth, &texheight, &texchannels, STBI_rgb_alpha);
-
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+
+	pixels = stbi_load("particle2.png", &texwidth, &texheight, &texchannels, STBI_rgb_alpha);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[7]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texwidth, texheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -1339,13 +1350,6 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
 
 	//////////////////// Create Vertex Buffer Object
 	GLuint vbo;
@@ -1458,7 +1462,7 @@ int main() {
 	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
-	if(!InitParticles(texLandscape[6]))
+	if(!InitParticles(texLandscape[7]))
 		return EXIT_FAILURE;
 
 	// Main loop
