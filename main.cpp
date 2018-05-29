@@ -801,8 +801,9 @@ void ShootBullet() {
 			bullets.erase(bullets.begin(), bullets.begin() + 36);
 		}
 		removeBullets();
+		glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), bullets.size() * sizeof(Vertex), bullets.data());
 		addVertices(bullets);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 		prevtime = glfwGetTime();
 	}
 }
@@ -1358,7 +1359,7 @@ int main() {
 		
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (vertices.size() + 1000) * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
 
 		// Bind vertex data to shader inputs using their index (location)
 		// These bindings are stored in the Vertex Array Object
