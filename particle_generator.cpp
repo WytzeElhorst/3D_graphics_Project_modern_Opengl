@@ -12,6 +12,7 @@
 ParticleGenerator::ParticleGenerator(GLuint program, GLuint texture, GLuint amount)
 	: program(program), texture(texture), amount(amount)
 {
+	VAO = 0;
 	this->init();
 }
 
