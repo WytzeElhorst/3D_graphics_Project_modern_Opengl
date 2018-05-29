@@ -35,7 +35,7 @@
     <ClInclude Include="..\camera.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="particle_generator.h">
+    <ClInclude Include="..\particle_generator.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

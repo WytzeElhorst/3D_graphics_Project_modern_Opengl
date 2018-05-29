@@ -19,6 +19,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "particle_generator.h"
 // Header for camera structure/functions
 #include "camera.h"
 
@@ -26,7 +27,6 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "visual studio/particle_generator.h"
 
 // Configuration
 const int WIDTH = 1200;
@@ -839,10 +839,21 @@ void moveShip() {
 	}
 }
 
+
+void UpdateParticles()
+{
+	Particles->Update(glfwGetTime() - particleTime);
+	particleTime = glfwGetTime();
+}
+
 void UpdateEnemies() {
+
 	for (int i = 0; i < 5; i++) {
 		//if health = 0, set inactive
 		if (enemydata[i].z <= 0.0f) {
+			// If previously not dead spawn particles
+			if (enemydata[i].w == 1)
+				Particles->AddCenter(enemydata[i]);
 			enemydata[i].w = 0;
 		}
 		//if inactive, remove from screen
@@ -944,6 +955,7 @@ bool InitParticles(GLuint texLandscape)
 	glShaderSource(vertexShader, 1, &vertexShaderCodePtr, nullptr);
 	glCompileShader(vertexShader);
 
+
 	std::string fragmentShaderCode = readFile("particle.frag");
 	const char* fragmentShaderCodePtr = fragmentShaderCode.data();
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -955,6 +967,7 @@ bool InitParticles(GLuint texLandscape)
 		return EXIT_FAILURE;
 	}
 
+
 	glAttachShader(particleProgram, vertexShader);
 	glAttachShader(particleProgram, fragmentShader);
 	glLinkProgram(particleProgram);
@@ -965,6 +978,13 @@ bool InitParticles(GLuint texLandscape)
 		return false;
 	}
 
+
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(WIDTH), static_cast<GLfloat>(HEIGHT), 0.0f, -1.0f, 1.0f);
+	glUseProgram(particleProgram);
+	glUniform1i(glGetUniformLocation(particleProgram, "sprite"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(particleProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+
 	//// Create particles
 	Particles = new ParticleGenerator(
 		particleProgram,
@@ -973,12 +993,6 @@ bool InitParticles(GLuint texLandscape)
 	);
 
 	return true;
-}
-
-void UpdateParticles()
-{
-	Particles->Update(glfwGetTime() - particleTime, glm::vec2(shiplocation.x*1.1, shiplocation.y*1.1) , 2);
-	particleTime = glfwGetTime();
 }
 
 int main() {
@@ -1177,12 +1191,12 @@ int main() {
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 
-	pixels = stbi_load("particle.png", &texwidth, &texheight, &texchannels, 3);
+	pixels = stbi_load("particle2.png", &texwidth, &texheight, &texchannels, STBI_rgb_alpha);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texwidth, texheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -1326,7 +1340,6 @@ int main() {
 		checkCollision();
 		UpdateEnemies();
 		UpdateParticles();
-		Particles->Draw();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer
@@ -1443,6 +1456,7 @@ int main() {
 		glEnable(GL_DEPTH_TEST);
 		// Execute draw command
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		Particles->Draw(mainCamera.vpMatrix());
 
 		// Present result to the screen
 		glfwSwapBuffers(window);
