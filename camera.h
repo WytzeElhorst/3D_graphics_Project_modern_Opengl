@@ -81,29 +81,6 @@ void cameraKeyboardHandler(int key, int action)
 
 	switch (key) 
 	{
-	case GLFW_KEY_J:
-		if (action == GLFW_PRESS)   camSpeed.x =  -sp;
-		if (action == GLFW_RELEASE) camSpeed.x =  0.0;
-		break;
-	case GLFW_KEY_L:
-		if (action == GLFW_PRESS)   camSpeed.x =  sp;
-		if (action == GLFW_RELEASE) camSpeed.x =  0.0;
-		break;
-	case GLFW_KEY_I:
-		if (action == GLFW_PRESS)   camSpeed.z =  sp;
-		if (action == GLFW_RELEASE) camSpeed.z =  0.0;
-		break;
-	case GLFW_KEY_K:
-		if (action == GLFW_PRESS)   camSpeed.z = -sp;
-		if (action == GLFW_RELEASE) camSpeed.z =  0.0;
-		break;
-	case GLFW_KEY_R:
-		if (action == GLFW_PRESS)   camSpeed.y =  sp;
-		if (action == GLFW_RELEASE) camSpeed.y =  0.0;
-		break;
-	case GLFW_KEY_F:
-		if (action == GLFW_PRESS)   camSpeed.y = -sp;
-		if (action == GLFW_RELEASE) camSpeed.y =  0.0;
 		break;
 	default:
 		break;
@@ -120,15 +97,6 @@ void camMouseButtonHandler(int button, int action)
 
 void camCursorPosHandler(double xpos, double ypos)
 {
-
-	if (!rightMousePressed) {
-		camRotSpeed = glm::vec2(0, 0);
-	} else {
-		camRotSpeed = glm::vec2(xpos, ypos) - cursorPos;
-	}
-	
-	cursorPos.x = (float)xpos;
-	cursorPos.y = (float)ypos;
 }
 
 void updateCamera(Camera& camera) 

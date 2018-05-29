@@ -65,7 +65,7 @@ double prevtime = 0;
 //shit variables
 glm::vec2 shiplocation;
 float speed = 0.02f;
-int hp = 5;
+int hp = 2;
 bool wpress;
 bool apress;
 bool spress;
@@ -99,18 +99,19 @@ glm::vec4 enemydata1 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata2 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata3 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-float spawnrate = 0.004f;
-float enemyspeed = 0.01f;
-float maxhp = 3;
+float spawnrate = 0.005f;
+float enemyspeed = 0.02f;
+float maxhp = 2;
 int enemieskilled = 0;
 
 //boss data
 float bosshp = 80;
-glm::vec3 bossdata = glm::vec3(0.0f, 4.0f, bosshp);
+glm::vec3 bossdata = glm::vec3(0.0f, 5.0f, bosshp);
 bool bossspawn = false;
 int bossright = 1;
 int bossdown = -1;
 int damagetimer = 0;
+int angle = 0;
 
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
@@ -218,6 +219,12 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 			break;
 		case GLFW_KEY_S:
 			spress = true;
+			break;
+		case GLFW_KEY_R:
+			hp = maxhp;
+			enemieskilled = 0;
+			shiplocation.x = 0.0f;
+			shiplocation.y = 0.0f;
 			break;
 		default:
 			break;
@@ -795,10 +802,6 @@ void ShootBullet() {
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 		prevtime = glfwGetTime();
 	}
-	for (int i = 0; i < 4; i++) {
-		bulletmult[i] += 0.1f;
-		bulletmult2[i] += 0.1f;
-	}
 }
 
 void rotateWeapon(GLuint mainProgram) {
@@ -870,17 +873,42 @@ void UpdateEnemies() {
 		}
 		// if active, move
 		if (enemydata[i].w == 1) {
-			if (enemydata[i].y <= shiplocation.y + 1) {
-				glm::vec2 enemypos = glm::vec2(enemydata[i].x, enemydata[i].y);
-				glm::vec2 move = normalize(shiplocation - enemypos);
-				enemydata[i].x += enemyspeed * move.x;
-				enemydata[i].y += enemyspeed * move.y;
+			if (!bossspawn) {
+				if (enemydata[i].y <= shiplocation.y + 1) {
+					glm::vec2 enemypos = glm::vec2(enemydata[i].x, enemydata[i].y);
+					glm::vec2 move = normalize(shiplocation - enemypos);
+					enemydata[i].x += enemyspeed * move.x;
+					enemydata[i].y += enemyspeed * move.y;
+				}
+				else {
+					enemydata[i].y += -enemyspeed;
+				}
+				if (enemydata[i].y <= -2) {
+					enemydata[i].w = 0;
+				}
 			}
 			else {
-				enemydata[i].y += -enemyspeed;
-			}
-			if (enemydata[i].y <= -2) {
-				enemydata[i].w = 0;
+				glm::vec2 bossloc = glm::vec2(bossdata.x, bossdata.y);
+				glm::vec2 shiploc = glm::vec2(enemydata[i].x, enemydata[i].y);
+				if (glm::distance(bossloc, shiploc) > 1) {
+					glm::vec2 move = normalize(bossloc - shiploc);
+					enemydata[i].x += enemyspeed * move.x;
+					enemydata[i].y += enemyspeed * move.y;
+				}
+				if (glm::distance(bossloc, shiploc) < 0.9) {
+					glm::vec2 move = normalize(bossloc - shiploc);
+					enemydata[i].x += -enemyspeed * move.x;
+					enemydata[i].y += -enemyspeed * move.y;
+				}
+				shiploc = glm::vec2(enemydata[i].x, enemydata[i].y);
+				if (glm::distance(bossloc, shiploc) <= 1.5) {
+					glm::vec2 orbit = (shiploc - bossloc);
+					glm::vec4 rota = glm::vec4(orbit.x, orbit.y, 0.0, 1.0);
+					glm::mat4 modelr = glm::rotate(glm::mat4(1.0f), (float) (0.002f*3.1415f*glm::radians((float) (angle))), glm::vec3(0, 0, 1));
+					rota = modelr * rota;
+					enemydata[i].x = rota.x + bossloc.x;
+					enemydata[i].y = rota.y + bossloc.y;
+				}
 			}
 		}
 	}
@@ -933,8 +961,8 @@ void checkCollision() {
 					}
 				}
 			}
-			if (shiplocation.x <= bossdata.x + 0.1f && shiplocation.x >= bossdata.x - 0.1f && damagetimer > 40) {
-				if (shiplocation.y <= bossdata.y + 0.15f && shiplocation.y >= bossdata.y - 0.15f) {
+			if (shiplocation.x <= bossdata.x + 0.2f && shiplocation.x >= bossdata.x - 0.2f && damagetimer > 40) {
+				if (shiplocation.y <= bossdata.y + 0.50f && shiplocation.y >= bossdata.y - 0.30f) {
 					hp += -1;
 					damagetimer = 0;
 				}
@@ -993,14 +1021,17 @@ glm::vec2 bossdirection() {
 void updateboss() {
 	if (bossdata.z > 0) {
 		glm::vec2 dir = bossdirection();
-		bossdata.y += 0.007 * dir.y;
-		bossdata.x += 0.007 * dir.x;
+		bossdata.y += 0.01 * dir.y;
+		bossdata.x += 0.01 * dir.x;
 	}
 	else {
 		bossspawn = false;
 		enemieskilled = 0;
-		bossdata.y = 4;
+		bossdata.y = 5;
 		bossdata.x = 0;
+		bossdata.z = bosshp;
+		spawnrate += 0.005f;
+		enemyspeed += 0.005f;
 	}
 }
 void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
@@ -1344,7 +1375,7 @@ int main() {
 	/////////////////// Create main camera
 	Camera mainCamera;
 	mainCamera.aspect = WIDTH / (float)HEIGHT;
-	mainCamera.position = glm::vec3(0.0f, -3.0f, 3.3f);
+	mainCamera.position = glm::vec3(0.0f, -2.0f, 3.3f);
 	mainCamera.forward = -mainCamera.position;
 	projection = mainCamera.pMatrix();
 	view = mainCamera.vMatrix();
@@ -1357,7 +1388,9 @@ int main() {
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
-		if (enemieskilled >= 3) {
+		angle = (angle % 359) - 180;
+		angle++;
+		if (enemieskilled >= 12) {
 			bossspawn = true;
 		}
 		if (bossspawn) {
@@ -1366,7 +1399,13 @@ int main() {
 		bultexture = !bultexture;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		glfwPollEvents();
-		moveShip();
+		if (hp > 0) {
+			moveShip();
+		}
+		else {
+			shiplocation.x = -5;
+			shiplocation.y = -5;
+		}
 		checkCollision();
 		UpdateEnemies();
 		////////// Stub code for you to fill in order to render the shadow map
@@ -1420,7 +1459,13 @@ int main() {
 
 		//rotate the weapon
 		rotateWeapon(mainProgram);
-		ShootBullet();
+		if (hp > 0) {
+			ShootBullet();
+		}
+		for (int i = 0; i < 4; i++) {
+			bulletmult[i] += 0.1f;
+			bulletmult2[i] += 0.1f;
+		}
 
 		//add uniforms
 		updateCamera(mainCamera);
