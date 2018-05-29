@@ -935,7 +935,7 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glUniform1f(glGetUniformLocation(mainProgram, "hp"), (float)(static_cast<int>(maxhp)));
 }
 
-void InitParticles(GLuint texLandscape[7])
+bool InitParticles(GLuint texLandscape)
 {
 	GLuint particleProgram = glCreateProgram();
 	std::string vertexShaderCode = readFile("particle.vert"); 		
@@ -950,21 +950,34 @@ void InitParticles(GLuint texLandscape[7])
 	glShaderSource(fragmentShader, 1, &fragmentShaderCodePtr, nullptr);
 	glCompileShader(fragmentShader);
 
+	if (!checkShaderErrors(vertexShader) || !checkShaderErrors(fragmentShader)) {
+		std::cerr << "Shader(s) failed to compile!" << std::endl;
+		return EXIT_FAILURE;
+	}
+
 	glAttachShader(particleProgram, vertexShader);
 	glAttachShader(particleProgram, fragmentShader);
 	glLinkProgram(particleProgram);
-	
+
+	if (!checkProgramErrors(particleProgram)) {
+		std::cerr << "Main program failed to link!" << std::endl;
+		std::cout << "Press enter to close."; getchar();
+		return false;
+	}
+
 	//// Create particles
 	Particles = new ParticleGenerator(
 		particleProgram,
-		texLandscape[6],
+		texLandscape,
 		500
 	);
+
+	return true;
 }
 
 void UpdateParticles()
 {
-	Particles->Update(glfwGetTime() - particleTime, glm::vec2(0, 0), 2, glm::vec2(0, 0));
+	Particles->Update(glfwGetTime() - particleTime, glm::vec2(shiplocation.x*1.1, shiplocation.y*1.1) , 2);
 	particleTime = glfwGetTime();
 }
 
@@ -1301,7 +1314,8 @@ int main() {
 	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
-	InitParticles(texLandscape);
+	if(!InitParticles(texLandscape[6]))
+		return EXIT_FAILURE;
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
@@ -1312,6 +1326,7 @@ int main() {
 		checkCollision();
 		UpdateEnemies();
 		UpdateParticles();
+		Particles->Draw();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer
@@ -1327,6 +1342,10 @@ int main() {
 
 			// Set viewport size
 			glViewport(0, 0, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
+
+			// Bind vertex data
+			glBindVertexArray(vao);
+
 
 			// Execute draw command
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -1346,8 +1365,6 @@ int main() {
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(shadowProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
 
-			// Bind vertex data
-			glBindVertexArray(vao);
 
 			// Execute draw command
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -1359,7 +1376,8 @@ int main() {
 		// Bind the shader
 		glUseProgram(mainProgram);
 
-		//rotate the weapon
+		//rotate the weapon		
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		rotateWeapon(mainProgram);
 		ShootBullet();
 
@@ -1423,7 +1441,6 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-
 		// Execute draw command
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 

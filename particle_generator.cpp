@@ -39,7 +39,7 @@ void ParticleGenerator::Update(GLfloat dt, glm::vec2 position, GLuint newParticl
 void ParticleGenerator::Draw()
 {
 	// Use additive blending to give it a 'glow' effect
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(program);
 	for (Particle particle : this->particles)
 	{
@@ -118,5 +118,5 @@ void ParticleGenerator::respawnParticle(Particle &particle, glm::vec2 position, 
 	particle.Position = position + random + offset;
 	particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f);
 	particle.Life = 1.0f;
-	particle.Velocity = glm::vec2(0,0) * 0.1f;
+	particle.Velocity = glm::vec2(1,1) * 0.1f;
 }

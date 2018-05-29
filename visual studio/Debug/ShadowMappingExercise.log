@@ -44,7 +44,5 @@ c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(
 c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(853): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(855): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(861): warning C4305: '=': truncation from 'double' to 'float'
-c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(967): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-  particle.vert
-c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\visual studio\particle.vert(1): fatal error C1021: invalid preprocessor command 'version'
-  Generating Code...
+c:\users\algirdas\documents\gitstuff\3d_graphics_project_modern_opengl\main.cpp(980): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+  ShadowMappingExercise.vcxproj -> C:\Users\Algirdas\Documents\GitStuff\3D_graphics_Project_modern_Opengl\visual studio\Debug\ShadowMappingExercise.exe

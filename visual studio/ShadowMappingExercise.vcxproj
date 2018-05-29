@@ -13,14 +13,14 @@
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\particle_generator.cpp" />
-    <ClCompile Include="particle.vert" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\particle.frag" />
+    <None Include="..\particle.vert" />
     <None Include="..\shader.frag" />
     <None Include="..\shader.vert" />
     <None Include="..\shadow.frag" />
     <None Include="..\shadow.vert" />
-    <None Include="particle.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\camera.h" />

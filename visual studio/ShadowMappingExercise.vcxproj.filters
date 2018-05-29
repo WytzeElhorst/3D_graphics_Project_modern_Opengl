@@ -13,7 +13,10 @@
     <None Include="..\shadow.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="particle.frag">
+    <None Include="..\particle.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\particle.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -42,9 +45,6 @@
     </ClCompile>
     <ClCompile Include="..\particle_generator.cpp">
       <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="particle.vert">
-      <Filter>Shaders</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
