@@ -41,10 +41,10 @@ private:
 	// State
 	std::vector<Particle> particles;
 	std::vector<glm::vec3> centers;
-	GLuint amount;
 	// Render state
 	GLuint program;
 	GLuint texture;
+	GLuint amount;
 	GLuint VAO;
 	// Initializes buffer and vertex attributes
 	void init();
