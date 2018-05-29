@@ -803,7 +803,6 @@ void ShootBullet() {
 		removeBullets();
 		glBufferSubData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), bullets.size() * sizeof(Vertex), bullets.data());
 		addVertices(bullets);
-		//glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 		prevtime = glfwGetTime();
 	}
 }
