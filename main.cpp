@@ -67,8 +67,8 @@ ParticleGenerator   *Particles;
 
 //shit variables
 glm::vec2 shiplocation;
-float speed = 0.01f;
-int hp = 5;
+float speed = 0.02f;
+int hp = 2;
 bool wpress;
 bool apress;
 bool spress;
@@ -102,9 +102,19 @@ glm::vec4 enemydata1 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata2 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata3 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-float spawnrate = 0.004f;
-float enemyspeed = 0.01f;
-float maxhp = 3;
+float spawnrate = 0.005f;
+float enemyspeed = 0.02f;
+float maxhp = 2;
+int enemieskilled = 0;
+
+//boss data
+float bosshp = 80;
+glm::vec3 bossdata = glm::vec3(0.0f, 5.0f, bosshp);
+bool bossspawn = false;
+int bossright = 1;
+int bossdown = -1;
+int damagetimer = 0;
+int angle = 0;
 
 
 void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
@@ -212,6 +222,12 @@ void keyboardHandler(GLFWwindow* window, int key, int scancode, int action, int 
 			break;
 		case GLFW_KEY_S:
 			spress = true;
+			break;
+		case GLFW_KEY_R:
+			hp = maxhp;
+			enemieskilled = 0;
+			shiplocation.x = 0.0f;
+			shiplocation.y = 0.0f;
 			break;
 		default:
 			break;
@@ -789,10 +805,6 @@ void ShootBullet() {
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 		prevtime = glfwGetTime();
 	}
-	for (int i = 0; i < 4; i++) {
-		bulletmult[i] += 0.1f;
-		bulletmult2[i] += 0.1f;
-	}
 }
 
 void rotateWeapon(GLuint mainProgram) {
@@ -849,6 +861,7 @@ void UpdateParticles()
 void UpdateEnemies() {
 
 	for (int i = 0; i < 5; i++) {
+		damagetimer++;
 		//if health = 0, set inactive
 		if (enemydata[i].z <= 0.0f) {
 			// If previously not dead spawn particles
@@ -874,17 +887,42 @@ void UpdateEnemies() {
 		}
 		// if active, move
 		if (enemydata[i].w == 1) {
-			if (enemydata[i].y <= shiplocation.y + 1) {
-				glm::vec2 enemypos = glm::vec2(enemydata[i].x, enemydata[i].y);
-				glm::vec2 move = normalize(shiplocation - enemypos);
-				enemydata[i].x += enemyspeed * move.x;
-				enemydata[i].y += enemyspeed * move.y;
+			if (!bossspawn) {
+				if (enemydata[i].y <= shiplocation.y + 1) {
+					glm::vec2 enemypos = glm::vec2(enemydata[i].x, enemydata[i].y);
+					glm::vec2 move = normalize(shiplocation - enemypos);
+					enemydata[i].x += enemyspeed * move.x;
+					enemydata[i].y += enemyspeed * move.y;
+				}
+				else {
+					enemydata[i].y += -enemyspeed;
+				}
+				if (enemydata[i].y <= -2) {
+					enemydata[i].w = 0;
+				}
 			}
 			else {
-				enemydata[i].y += -enemyspeed;
-			}
-			if (enemydata[i].y <= -2) {
-				enemydata[i].w = 0;
+				glm::vec2 bossloc = glm::vec2(bossdata.x, bossdata.y);
+				glm::vec2 shiploc = glm::vec2(enemydata[i].x, enemydata[i].y);
+				if (glm::distance(bossloc, shiploc) > 1) {
+					glm::vec2 move = normalize(bossloc - shiploc);
+					enemydata[i].x += enemyspeed * move.x;
+					enemydata[i].y += enemyspeed * move.y;
+				}
+				if (glm::distance(bossloc, shiploc) < 0.9) {
+					glm::vec2 move = normalize(bossloc - shiploc);
+					enemydata[i].x += -enemyspeed * move.x;
+					enemydata[i].y += -enemyspeed * move.y;
+				}
+				shiploc = glm::vec2(enemydata[i].x, enemydata[i].y);
+				if (glm::distance(bossloc, shiploc) <= 1.5) {
+					glm::vec2 orbit = (shiploc - bossloc);
+					glm::vec4 rota = glm::vec4(orbit.x, orbit.y, 0.0, 1.0);
+					glm::mat4 modelr = glm::rotate(glm::mat4(1.0f), (float) (0.002f*3.1415f*glm::radians((float) (angle))), glm::vec3(0, 0, 1));
+					rota = modelr * rota;
+					enemydata[i].x = rota.x + bossloc.x;
+					enemydata[i].y = rota.y + bossloc.y;
+				}
 			}
 		}
 	}
@@ -900,6 +938,9 @@ void checkCollision() {
 					if (bulpos.x <= enemydata[s].x + 0.1f && bulpos.x >= enemydata[s].x - 0.1f) {
 						if (bulpos.y <= enemydata[s].y + 0.15f && bulpos.y >= enemydata[s].y - 0.15f) {
 							enemydata[s].z += -1;
+							if (enemydata[s].z <= 0) {
+								enemieskilled++;
+							}
 							if (i < 4) {
 								bulletmult[i] += 10;
 							}
@@ -918,8 +959,95 @@ void checkCollision() {
 			}
 		}
 	}
+	if (bossspawn) {
+		for (int i = 0; i < 8; i++) {
+			glm::vec2 bulpos = bulletPosition(i);
+			if (!(bulpos.x == 0 && bulpos.y == 0)) {
+				if (bulpos.x <= bossdata.x + 0.2f && bulpos.x >= bossdata.x - 0.2f) {
+					if (bulpos.y <= bossdata.y + 0.50f && bulpos.y >= bossdata.y - 0.30f) {
+						bossdata.z += -1;
+						if (i < 4) {
+							bulletmult[i] += 10;
+						}
+						if (i >= 4) {
+							bulletmult2[i - 4] += 10;
+						}
+					}
+				}
+			}
+			if (shiplocation.x <= bossdata.x + 0.2f && shiplocation.x >= bossdata.x - 0.2f && damagetimer > 40) {
+				if (shiplocation.y <= bossdata.y + 0.50f && shiplocation.y >= bossdata.y - 0.30f) {
+					hp += -1;
+					damagetimer = 0;
+				}
+			}
+		}
+	}
+
 }
 
+void loadObject(const char* path, int num) {
+	glm::mat4 model2 = glm::scale(glm::mat4(1.0f), glm::vec3(0.6, 0.6, 0.6));
+	model2 = glm::rotate(model2, 1.5f*3.1415f, glm::vec3(1, 0, 0));
+	model2 = glm::rotate(model2, 1.1f*3.1415f, glm::vec3(0, 0, 1));
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string err;
+
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, path)) {
+		std::cerr << err << std::endl;
+	}
+
+	// Read triangle vertices from OBJ file
+	for (const auto& shape : shapes) {
+		for (const auto& index : shape.mesh.indices) {
+			Vertex vertex = {};
+
+			// Retrieve coordinates for vertex by index
+			vertex.pos = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+
+			// Retrieve components of normal by index
+			vertex.normal = {
+				attrib.normals[3 * index.normal_index + 0],
+				attrib.normals[3 * index.normal_index + 1],
+				attrib.normals[3 * index.normal_index + 2]
+			};
+			vertex.ID = 6;
+			vertex.bulnum = num;
+			vertex.ori0 = model2[0];
+			vertex.ori1 = model2[1];
+			vertex.ori2 = model2[2];
+			vertex.ori3 = model2[3];
+			vertices.push_back(vertex);
+		}
+	}
+}
+
+glm::vec2 bossdirection() {
+	return normalize(shiplocation - glm::vec2(bossdata.x, bossdata.y));
+}
+
+void updateboss() {
+	if (bossdata.z > 0) {
+		glm::vec2 dir = bossdirection();
+		bossdata.y += 0.01 * dir.y;
+		bossdata.x += 0.01 * dir.x;
+	}
+	else {
+		bossspawn = false;
+		enemieskilled = 0;
+		bossdata.y = 5;
+		bossdata.x = 0;
+		bossdata.z = bosshp;
+		spawnrate += 0.005f;
+		enemyspeed += 0.005f;
+	}
+}
 void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glm::mat4 mvp = mainCamera.vpMatrix();
 	glm::mat4 lightMVP = secondCamera.vpMatrix();
@@ -937,6 +1065,7 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata2"), 1, glm::value_ptr(enemydata[2]));
 	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata3"), 1, glm::value_ptr(enemydata[3]));
 	glUniform4fv(glGetUniformLocation(mainProgram, "enemydata4"), 1, glm::value_ptr(enemydata[4]));
+	glUniform3fv(glGetUniformLocation(mainProgram, "bossdata"), 1, glm::value_ptr(bossdata));
 
 	//bind shiplocation
 	glUniform2fv(glGetUniformLocation(mainProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
@@ -944,6 +1073,7 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	// Expose current time in shader uniform
 	glUniform1f(glGetUniformLocation(mainProgram, "time"), (float)(static_cast<int>(glfwGetTime() * 1000) % 20000) / 1000);
 	glUniform1f(glGetUniformLocation(mainProgram, "hp"), (float)(static_cast<int>(maxhp)));
+	glUniform1f(glGetUniformLocation(mainProgram, "bosshp"), (float)(static_cast<int>(bosshp)));
 }
 
 bool InitParticles(GLuint texLandscape)
@@ -1008,6 +1138,10 @@ int main() {
 	initWeaponMesh();
 	initEnemyShipMesh();
 	drawEnemyShip();
+	loadObject("dragonfull.obj", 0);
+	loadObject("dragon64.obj", 1);
+	loadObject("dragon32.obj", 2);
+	loadObject("dragon16.obj", 3);
 	//////////////////// Create window and OpenGL 4.3 debug context
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -1190,12 +1324,14 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+	pixels = stbi_load("toon_map.png", &texwidth, &texheight, &texchannels, 3);
 
 	pixels = stbi_load("particle2.png", &texwidth, &texheight, &texchannels, STBI_rgb_alpha);
 
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texwidth, texheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -1203,18 +1339,12 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
-	////////////////////////// Load vertices of model
-	{
-		tinyobj::attrib_t attrib;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string err;
 
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &err, "scene.obj")) {
-			std::cerr << err << std::endl;
-			return EXIT_FAILURE;
-		}
-	}
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 
 	//////////////////// Create Vertex Buffer Object
@@ -1317,7 +1447,7 @@ int main() {
 	/////////////////// Create main camera
 	Camera mainCamera;
 	mainCamera.aspect = WIDTH / (float)HEIGHT;
-	mainCamera.position = glm::vec3(0.0f, -3.0f, 3.3f);
+	mainCamera.position = glm::vec3(0.0f, -2.0f, 3.3f);
 	mainCamera.forward = -mainCamera.position;
 	projection = mainCamera.pMatrix();
 	view = mainCamera.vMatrix();
@@ -1333,10 +1463,24 @@ int main() {
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
+		angle = (angle % 359) - 180;
+		angle++;
+		if (enemieskilled >= 12) {
+			bossspawn = true;
+		}
+		if (bossspawn) {
+			updateboss();
+		}
 		bultexture = !bultexture;
 		glfwGetCursorPos(window, &xpos, &ypos);
 		glfwPollEvents();
-		moveShip();
+		if (hp > 0) {
+			moveShip();
+		}
+		else {
+			shiplocation.x = -5;
+			shiplocation.y = -5;
+		}
 		checkCollision();
 		UpdateEnemies();
 		UpdateParticles();
@@ -1375,6 +1519,8 @@ int main() {
 			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata2"), 1, glm::value_ptr(enemydata[2]));
 			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata3"), 1, glm::value_ptr(enemydata[3]));
 			glUniform4fv(glGetUniformLocation(shadowProgram, "enemydata4"), 1, glm::value_ptr(enemydata[4]));
+			glUniform3fv(glGetUniformLocation(shadowProgram, "bossdata"), 1, glm::value_ptr(bossdata));
+			glUniform1f(glGetUniformLocation(shadowProgram, "bosshp"), (float)(static_cast<int>(bosshp)));
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(shadowProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
 
@@ -1392,7 +1538,13 @@ int main() {
 		//rotate the weapon		
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		rotateWeapon(mainProgram);
-		ShootBullet();
+		if (hp > 0) {
+			ShootBullet();
+		}
+		for (int i = 0; i < 4; i++) {
+			bulletmult[i] += 0.1f;
+			bulletmult2[i] += 0.1f;
+		}
 
 		//add uniforms
 		updateCamera(mainCamera);
@@ -1429,6 +1581,12 @@ int main() {
 		glActiveTexture(GL_TEXTURE0 + texture_unit5);
 		glBindTexture(GL_TEXTURE_2D, texLandscape[5]);
 		glUniform1i(glGetUniformLocation(mainProgram, "metal"), texture_unit5);
+
+		// Bind the boss texture slot 6
+		GLint texture_unit6 = 6;
+		glActiveTexture(GL_TEXTURE0 + texture_unit6);
+		glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
+		glUniform1i(glGetUniformLocation(mainProgram, "texToon"), texture_unit6);
 
 		// swap between two bullet textures
 		if (bultexture) {

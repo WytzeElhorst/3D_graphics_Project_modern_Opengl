@@ -10,6 +10,8 @@ layout(location = 17) uniform vec4 enemydata1;
 layout(location = 18) uniform vec4 enemydata2;
 layout(location = 19) uniform vec4 enemydata3;
 layout(location = 20) uniform vec4 enemydata4;
+layout(location = 23) uniform vec3 bossdata;
+layout(location = 24) uniform float bosshp;
 layout(location = 7) uniform vec2 shiptrans; 
 
 // Per-vertex attributes
@@ -116,6 +118,68 @@ void main() {
 		}
 		move.z += 0.58f;
 		gl_Position = mvp * vec4(move, 1.0f);
+	}
+	if (ID == 6) {
+		if (bossdata.z >= bosshp * 0.75f){
+			if (bulnum == 0) {
+				mat4 ori = model;
+				ori[0] = ori0;
+				ori[1] = ori1;
+				ori[2] = ori2;
+				ori[3] = ori3;
+				vec4 posr = vec4(pos, 1);
+				posr = posr * ori;
+				posr.z += 0.6;
+				gl_Position = mvp * vec4(posr.x + bossdata.x, posr.y + bossdata.y, posr.z, 1.0f);
+			} else {
+			gl_Position = mvp * vec4(-5, -5, -5, 1.0f);
+			}
+		}
+		if (bossdata.z < bosshp * 0.75f && bossdata.z >= bosshp * 0.5f){
+			if (bulnum == 1) {
+				mat4 ori = model;
+				ori[0] = ori0;
+				ori[1] = ori1;
+				ori[2] = ori2;
+				ori[3] = ori3;
+				vec4 posr = vec4(pos, 1);
+				posr = posr * ori;
+				posr.z += 0.6;
+				gl_Position = mvp * vec4(posr.x + bossdata.x, posr.y + bossdata.y, posr.z, 1.0f);
+			} else {
+			gl_Position = mvp * vec4(-5, -5, -5, 1.0f);
+			}
+		}
+		if (bossdata.z < bosshp * 0.50f && bossdata.z >= bosshp * 0.25f){
+			if (bulnum == 2) {
+				mat4 ori = model;
+				ori[0] = ori0;
+				ori[1] = ori1;
+				ori[2] = ori2;
+				ori[3] = ori3;
+				vec4 posr = vec4(pos, 1);
+				posr = posr * ori;
+				posr.z += 0.6;
+				gl_Position = mvp * vec4(posr.x + bossdata.x, posr.y + bossdata.y, posr.z, 1.0f);
+			} else {
+			gl_Position = mvp * vec4(-5, -5, -5, 1.0f);
+			}
+		}
+		if (bossdata.z < bosshp * 0.25f && bossdata.z >= bosshp * 0.0f){
+			if (bulnum == 3) {
+				mat4 ori = model;
+				ori[0] = ori0;
+				ori[1] = ori1;
+				ori[2] = ori2;
+				ori[3] = ori3;
+				vec4 posr = vec4(pos, 1);
+				posr = posr * ori;
+				posr.z += 0.6;
+				gl_Position = mvp * vec4(posr.x + bossdata.x, posr.y + bossdata.y, posr.z, 1.0f);
+			} else {
+			gl_Position = mvp * vec4(-5, -5, -5, 1.0f);
+			}
+		}
 	}
 	fragPos = move;
 	fragNormal = nor;
