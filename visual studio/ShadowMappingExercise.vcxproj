@@ -12,8 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\particle_generator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\particle.frag" />
+    <None Include="..\particle.vert" />
     <None Include="..\shader.frag" />
     <None Include="..\shader.vert" />
     <None Include="..\shadow.frag" />
@@ -21,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\camera.h" />
+    <ClInclude Include="..\particle_generator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F108EF87-748D-44F4-8D03-92EF4625363D}</ProjectGuid>

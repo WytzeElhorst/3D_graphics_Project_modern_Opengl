@@ -1,3 +1,5 @@
+#ifndef CAMERA_H
+#define CAMERA_H
 // Library for vertex and matrix math
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -106,3 +108,5 @@ void updateCamera(Camera& camera)
 	camRotSpeed = glm::vec2(0, 0);
 }
 
+
+#endif

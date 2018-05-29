@@ -19,6 +19,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "particle_generator.h"
 // Header for camera structure/functions
 #include "camera.h"
 
@@ -60,6 +61,8 @@ float bullettime = 0;
 glm::vec4 bulletmult;
 glm::vec4 bulletmult2;
 double prevtime = 0;
+double particleTime = 0;
+ParticleGenerator   *Particles;
 
 
 //shit variables
@@ -848,11 +851,22 @@ void moveShip() {
 	}
 }
 
+
+void UpdateParticles()
+{
+	Particles->Update(glfwGetTime() - particleTime);
+	particleTime = glfwGetTime();
+}
+
 void UpdateEnemies() {
+
 	for (int i = 0; i < 5; i++) {
 		damagetimer++;
 		//if health = 0, set inactive
 		if (enemydata[i].z <= 0.0f) {
+			// If previously not dead spawn particles
+			if (enemydata[i].w == 1)
+				Particles->AddCenter(enemydata[i]);
 			enemydata[i].w = 0;
 		}
 		//if inactive, remove from screen
@@ -1062,6 +1076,55 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 	glUniform1f(glGetUniformLocation(mainProgram, "bosshp"), (float)(static_cast<int>(bosshp)));
 }
 
+bool InitParticles(GLuint texLandscape)
+{
+	GLuint particleProgram = glCreateProgram();
+	std::string vertexShaderCode = readFile("particle.vert"); 		
+	const char* vertexShaderCodePtr = vertexShaderCode.data();
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderCodePtr, nullptr);
+	glCompileShader(vertexShader);
+
+
+	std::string fragmentShaderCode = readFile("particle.frag");
+	const char* fragmentShaderCodePtr = fragmentShaderCode.data();
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderCodePtr, nullptr);
+	glCompileShader(fragmentShader);
+
+	if (!checkShaderErrors(vertexShader) || !checkShaderErrors(fragmentShader)) {
+		std::cerr << "Shader(s) failed to compile!" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+
+	glAttachShader(particleProgram, vertexShader);
+	glAttachShader(particleProgram, fragmentShader);
+	glLinkProgram(particleProgram);
+
+	if (!checkProgramErrors(particleProgram)) {
+		std::cerr << "Main program failed to link!" << std::endl;
+		std::cout << "Press enter to close."; getchar();
+		return false;
+	}
+
+
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(WIDTH), static_cast<GLfloat>(HEIGHT), 0.0f, -1.0f, 1.0f);
+	glUseProgram(particleProgram);
+	glUniform1i(glGetUniformLocation(particleProgram, "sprite"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(particleProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+
+	//// Create particles
+	Particles = new ParticleGenerator(
+		particleProgram,
+		texLandscape,
+		500
+	);
+
+	return true;
+}
+
 int main() {
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW!" << std::endl;
@@ -1181,8 +1244,8 @@ int main() {
 	int texwidth, texheight, texchannels;
 	stbi_uc* pixels = stbi_load("soil.jpg", &texwidth, &texheight, &texchannels, 3);
 
-	GLuint texLandscape[7];
-	glGenTextures(7, texLandscape);
+	GLuint texLandscape[8];
+	glGenTextures(8, texLandscape);
 	glBindTexture(GL_TEXTURE_2D, texLandscape[0]);
 
 	// Upload pixels into texture
@@ -1267,13 +1330,26 @@ int main() {
 	glBindTexture(GL_TEXTURE_2D, texLandscape[6]);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texwidth, texheight, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-
+	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
+
+	pixels = stbi_load("particle2.png", &texwidth, &texheight, &texchannels, STBI_rgb_alpha);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texLandscape[7]);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texwidth, texheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	//////////////////// Create Vertex Buffer Object
 	GLuint vbo;
@@ -1386,6 +1462,9 @@ int main() {
 	secondCamera.position = glm::vec3(0.0f, 6.0f, 6.0f);
 	secondCamera.forward = -secondCamera.position;
 
+	if(!InitParticles(texLandscape[7]))
+		return EXIT_FAILURE;
+
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
 		angle = (angle % 359) - 180;
@@ -1408,6 +1487,7 @@ int main() {
 		}
 		checkCollision();
 		UpdateEnemies();
+		UpdateParticles();
 		////////// Stub code for you to fill in order to render the shadow map
 		{
 			// Bind the off-screen framebuffer
@@ -1423,6 +1503,10 @@ int main() {
 
 			// Set viewport size
 			glViewport(0, 0, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
+
+			// Bind vertex data
+			glBindVertexArray(vao);
+
 
 			// Execute draw command
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -1444,8 +1528,6 @@ int main() {
 			//bind shiplocation
 			glUniform2fv(glGetUniformLocation(shadowProgram, "shiptrans"), 1, glm::value_ptr(shiplocation));
 
-			// Bind vertex data
-			glBindVertexArray(vao);
 
 			// Execute draw command
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
@@ -1457,7 +1539,8 @@ int main() {
 		// Bind the shader
 		glUseProgram(mainProgram);
 
-		//rotate the weapon
+		//rotate the weapon		
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		rotateWeapon(mainProgram);
 		if (hp > 0) {
 			ShootBullet();
@@ -1533,9 +1616,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-
 		// Execute draw command
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		Particles->Draw(mainCamera.vpMatrix());
 
 		// Present result to the screen
 		glfwSwapBuffers(window);
