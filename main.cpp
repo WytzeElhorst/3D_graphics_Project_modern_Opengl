@@ -125,7 +125,7 @@ void addTriangle(std::vector<Vertex> obs, Vertex v1, Vertex v2, Vertex v3) {
 
 // Helper function to read a file like a shader
 std::string readFile(const std::string& path) {
-	std::ifstream file(path, std::ios::binary);
+	std::ifstream file(path, std::ios::in);
 
 	std::stringstream buffer;
 	buffer << file.rdbuf();
@@ -1079,7 +1079,8 @@ void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
 bool InitParticles(GLuint texLandscape)
 {
 	GLuint particleProgram = glCreateProgram();
-	std::string vertexShaderCode = readFile("particle.vert"); 		
+	std::string vertexShaderCode = readFile("particle.vert"); 
+
 	const char* vertexShaderCodePtr = vertexShaderCode.data();
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderCodePtr, nullptr);
