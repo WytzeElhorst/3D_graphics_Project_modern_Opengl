@@ -786,6 +786,7 @@ glm::vec2 bulletPosition(int num) {
 
 void ShootBullet() {
 	if (prevtime + 0.250 <= glfwGetTime()) {
+		damagetimer++;
 		initBulletMesh(nextbul, glm::vec2(xpos, ypos), model);
 		if (nextbul < 4) {
 			bulletmult[nextbul] = 0.0f;
@@ -861,7 +862,6 @@ void UpdateParticles()
 void UpdateEnemies() {
 
 	for (int i = 0; i < 5; i++) {
-		damagetimer++;
 		//if health = 0, set inactive
 		if (enemydata[i].z <= 0.0f) {
 			// If previously not dead spawn particles
@@ -975,7 +975,7 @@ void checkCollision() {
 					}
 				}
 			}
-			if (shiplocation.x <= bossdata.x + 0.2f && shiplocation.x >= bossdata.x - 0.2f && damagetimer > 40) {
+			if (shiplocation.x <= bossdata.x + 0.2f && shiplocation.x >= bossdata.x - 0.2f && damagetimer > 4) {
 				if (shiplocation.y <= bossdata.y + 0.50f && shiplocation.y >= bossdata.y - 0.30f) {
 					hp += -1;
 					damagetimer = 0;
