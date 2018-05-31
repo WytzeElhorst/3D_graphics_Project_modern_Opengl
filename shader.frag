@@ -88,7 +88,7 @@ void main() {
 	vec3 lightDir = normalize(lightPos - fragPos);
 	vec3 h = normalize(lightDir + viewDir);
 	float diff = dot(fragNormal, lightDir);
-	float spec = pow(dot(normalize(fragNormal), h), 16);
+	float spec = pow(dot(normalize(fragNormal), h), 15);
 	if (spec > 0.2) {
 	spec = 1.0;
 	} else {
