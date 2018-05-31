@@ -105,7 +105,7 @@ glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 float spawnrate = 0.005f;
 float enemyspeed = 0.02f;
 float maxhp = 2;
-int enemieskilled = 12;
+int enemieskilled = 0;
 
 //boss data
 float bosshp = 80;
@@ -1040,8 +1040,9 @@ void updateboss() {
 		bossdata.y = 5;
 		bossdata.x = 0;
 		bossdata.z = bosshp;
-		spawnrate += 0.005f;
-		enemyspeed += 0.005f;
+		spawnrate += 0.003f;
+		enemyspeed += 0.003f;
+		maxhp++;
 	}
 }
 void setUniforms(GLuint mainProgram, Camera mainCamera, Camera secondCamera) {
