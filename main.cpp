@@ -29,8 +29,8 @@
 #include <vector>
 
 // Configuration
-const int WIDTH = 1200;
-const int HEIGHT = 900;
+const int WIDTH = 1920;
+const int HEIGHT = 1080;
 
 // Per-vertex data
 struct Vertex {
@@ -77,7 +77,7 @@ bool dpress;
 //decides which bullettexture to use
 bool bultexture = true;
 
-int NbVertY = 200, NbVertX = 200;
+int NbVertY = 300, NbVertX = 400;
 std::vector<float> SurfaceVertices3f;
 std::vector<float> SurfaceNormals3f;
 std::vector<float> SurfaceColors3f;
@@ -105,7 +105,7 @@ glm::vec4 enemydata4 = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 float spawnrate = 0.005f;
 float enemyspeed = 0.02f;
 float maxhp = 2;
-int enemieskilled = 0;
+int enemieskilled = 12;
 
 //boss data
 float bosshp = 80;
@@ -909,16 +909,12 @@ void UpdateEnemies() {
 					enemydata[i].x += enemyspeed * move.x;
 					enemydata[i].y += enemyspeed * move.y;
 				}
-				if (glm::distance(bossloc, shiploc) < 0.9) {
-					glm::vec2 move = normalize(bossloc - shiploc);
-					enemydata[i].x += -enemyspeed * move.x;
-					enemydata[i].y += -enemyspeed * move.y;
-				}
 				shiploc = glm::vec2(enemydata[i].x, enemydata[i].y);
-				if (glm::distance(bossloc, shiploc) <= 1.5) {
+				if (glm::distance(bossloc, shiploc) <= 1.1) {
 					glm::vec2 orbit = (shiploc - bossloc);
-					glm::vec4 rota = glm::vec4(orbit.x, orbit.y, 0.0, 1.0);
-					glm::mat4 modelr = glm::rotate(glm::mat4(1.0f), (float) (0.002f*3.1415f*glm::radians((float) (angle))), glm::vec3(0, 0, 1));
+					glm::vec4 rota = glm::vec4(orbit.x, orbit.y, 0.0, 0.0);
+					rota = normalize(rota);
+					glm::mat4 modelr = glm::rotate(glm::mat4(1.0f), (float) (0.006f*glm::radians((float) (angle))), glm::vec3(0, 0, 1));
 					rota = modelr * rota;
 					enemydata[i].x = rota.x + bossloc.x;
 					enemydata[i].y = rota.y + bossloc.y;
@@ -1150,7 +1146,7 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Shadow mapping practical", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Shadow mapping practical", glfwGetPrimaryMonitor(), nullptr);
 	if (!window) {
 		std::cerr << "Failed to create OpenGL context!" << std::endl;
 		std::cout << "Press enter to close."; getchar();
